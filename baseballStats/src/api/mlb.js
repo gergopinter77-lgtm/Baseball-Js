@@ -53,3 +53,7 @@ export function playerPhotoUrl(id) {
 export function teamLogoUrl(teamId) {
   return `https://www.mlbstatic.com/team-logos/team-cap-on-dark/${teamId}.svg`
 }
+
+export function getStandings(season) {
+  return get(`/standings?leagueId=103,104&season=${season}&standingsTypes=regularSeason&hydrate=division,team`)
+}
