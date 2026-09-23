@@ -30,3 +30,24 @@ export function getSchedule(date) {
 export function getLeaders(category, season) {
   return get(`/stats/leaders?leaderCategories=${category}&season=${season}`)
 }
+
+// One player + their team + this season's stats (season totals and every game)
+export function getPlayerWithStats(id, season) {
+  const hydrate = `currentTeam,stats(group=[hitting,pitching],type=
+  [season,gameLog],season=${season})`
+  return get (`/people/${id}?hydrate=${hydrate}`)
+}
+
+// Final scores + short team names for a list of games
+export function getGames(gamePks) {
+  return get (`/schedule?gamePks=${gamePks.join(',')}&hydrate=team`)
+}
+
+// Picture links (these are images, not JSON, so we only build the URL)
+  export function playerPhotoUrl(id) {
+    return `https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_213,q_auto:best/v1/people/${id}/headshot/67/current`
+  }
+
+  export function teamlogoUrl(teamId) {
+    return `https://www.mlbstatic.com/team-logos/team-cap-on-dark/${teamId}.svg`
+  }
