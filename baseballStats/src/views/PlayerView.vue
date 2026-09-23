@@ -1,8 +1,8 @@
 <template>
-    <main class="px-4 py-8">
-        <div class="max-w-5xl mx-auto bg-primary rounded-lg p-6 text-white">
-            <p v-if="loading" class="text-center text-primary-light py-20">Loading player...</p>
-            <p v-else-if="error" class="text-center text-secondary py-20">{{ error }}</p>
+    <main class="mx-20 py-12">
+        <div class="grid grid-cols-12 gap-x-8 gap-y-10 bg-primary rounded-2xl p-12 text-white">
+            <p v-if="loading" class="col-span-12 text-center text-3xl text-primary-light py-32">Loading player...</p>
+            <p v-else-if="error" class="col-span-12 text-center text-3xl text-secondary py-32">{{ error }}</p>
 
             <template v-else-if="player">
                 <PlayerHeader :player="player" />

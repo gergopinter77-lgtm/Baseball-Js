@@ -1,11 +1,11 @@
 <template>
-    <div>
+    <div class="col-span-12 grid grid-cols-subgrid gap-y-10">
         <!-- ===== Tab buttons ===== -->
-        <nav class="flex mt-8 border-b border-white/10">
+        <nav class="col-span-12 flex border-b-2 border-white/10">
             <button
                 v-for="tab in TABS"
                 :key="tab.id"
-                class="flex-1 py-3 text-lg border-b-2 hover:cursor-pointer"
+                class="flex-1 py-5 text-3xl border-b-4 -mb-0.5 hover:cursor-pointer"
                 :class="activeTab === tab.id
                     ? 'border-secondary text-secondary'
                     : 'border-transparent text-primary-light hover:text-white'"
@@ -16,63 +16,67 @@
         </nav>
 
         <!-- ===== Overview tab ===== -->
-        <section v-if="activeTab === 'overview'" class="grid md:grid-cols-[1fr_2fr] gap-6 mt-6">
-            <div class="bg-primary-gradient rounded-lg p-4 self-start">
-                <h2 class="text-center font-semibold mb-4">{{ CURRENT_SEASON }} Regular Season</h2>
+        <template v-if="activeTab === 'overview'">
+            <div class="col-span-12 2xl:col-span-4 self-start bg-primary-gradient rounded-2xl p-8">
+                <h2 class="text-center text-3xl font-semibold mb-8">{{ CURRENT_SEASON }} Regular Season</h2>
 
-                <div v-if="seasonStats" class="grid grid-cols-5 gap-2">
+                <div v-if="seasonStats" class="grid grid-cols-5 gap-4">
                     <div
                         v-for="item in statConfig.summary"
                         :key="item.key"
-                        class="bg-white/10 rounded py-2 text-center"
+                        class="bg-white/10 rounded-xl py-4 text-center"
                     >
-                        <div class="text-lg font-bold">{{ seasonStats[item.key] ?? '–' }}</div>
-                        <div class="text-xs text-primary-light">{{ item.label }}</div>
+                        <div class="text-2xl font-bold">{{ seasonStats[item.key] ?? '–' }}</div>
+                        <div class="text-base text-primary-light mt-1">{{ item.label }}</div>
                     </div>
                 </div>
-                <p v-else class="text-center text-primary-light">No stats for {{ CURRENT_SEASON }} yet.</p>
+                <p v-else class="text-center text-2xl text-primary-light">No stats for {{ CURRENT_SEASON }} yet.</p>
 
                 <button
-                    class="block w-full mt-4 bg-white/90 hover:bg-white text-primary font-semibold rounded py-1 hover:cursor-pointer"
+                    class="block w-full mt-8 bg-white/90 hover:bg-white text-primary text-2xl font-semibold rounded-xl py-3 hover:cursor-pointer"
                     @click="activeTab = 'season'"
                 >
                     See all
                 </button>
             </div>
 
-            <div class="bg-primary-gradient rounded-lg p-4">
-                <h2 class="text-center font-semibold mb-2">Most recent games</h2>
+            <div class="col-span-12 2xl:col-span-8 bg-primary-gradient rounded-2xl p-8">
+                <h2 class="text-center text-3xl font-semibold mb-4">Most recent games</h2>
                 <GameLogTable :games="games.slice(0, 5)" :columns="statConfig.gameLog" />
                 <button
                     v-if="games.length > 5"
-                    class="block mx-auto mt-3 text-primary-light hover:text-white hover:cursor-pointer"
+                    class="block mx-auto mt-6 text-2xl text-primary-light hover:text-white hover:cursor-pointer"
                     @click="activeTab = 'games'"
                 >
                     All games →
                 </button>
             </div>
-        </section>
+        </template>
 
         <!-- ===== Games tab ===== -->
-        <section v-else-if="activeTab === 'games'" class="mt-6">
+        <div v-else-if="activeTab === 'games'" class="col-span-12">
             <GameLogTable :games="games" :columns="statConfig.gameLog" />
-        </section>
+        </div>
 
         <!-- ===== Season tab ===== -->
-        <section v-else-if="activeTab === 'season'" class="mt-6">
-            <h2 class="text-xl font-semibold mb-4">
+        <template v-else-if="activeTab === 'season'">
+            <h2 class="col-span-12 text-4xl font-semibold">
                 {{ CURRENT_SEASON }} Regular Season · {{ isPitcher ? 'Pitching' : 'Hitting' }}
             </h2>
 
-            <div v-if="seasonStats" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                <div v-for="item in statConfig.season" :key="item.key" class="bg-primary-gradient rounded-lg p-4">
-                    <div class="text-sm text-secondary font-semibold">{{ item.label }}</div>
-                    <div class="text-2xl font-bold">{{ seasonStats[item.key] ?? '–' }}</div>
-                    <div class="text-xs text-primary-light">{{ item.name }}</div>
+            <template v-if="seasonStats">
+                <div
+                    v-for="item in statConfig.season"
+                    :key="item.key"
+                    class="col-span-4 xl:col-span-3 2xl:col-span-2 bg-primary-gradient rounded-2xl p-6"
+                >
+                    <div class="text-xl text-secondary font-semibold">{{ item.label }}</div>
+                    <div class="text-5xl font-bold mt-2">{{ seasonStats[item.key] ?? '–' }}</div>
+                    <div class="text-lg text-primary-light mt-2">{{ item.name }}</div>
                 </div>
-            </div>
-            <p v-else class="text-primary-light">No stats for {{ CURRENT_SEASON }} yet.</p>
-        </section>
+            </template>
+            <p v-else class="col-span-12 text-2xl text-primary-light">No stats for {{ CURRENT_SEASON }} yet.</p>
+        </template>
     </div>
 </template>
 
