@@ -29,7 +29,10 @@
 
 <script setup>
 import { ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { searchPlayers } from '@/api/mlb'
+
+const router = useRouter()
 
 const MIN_CHARS = 2
 const MAX_RESULTS = 8
@@ -97,6 +100,7 @@ function selectPlayer(p) {
     loading.value = false
     query.value = p.fullName
     players.value = []
+    router.push({ name: 'player', params: { id: p.id } })   // ← ADD THIS
 }
 </script>
 

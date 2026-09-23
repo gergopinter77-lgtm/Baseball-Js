@@ -25,6 +25,11 @@ const router = createRouter({
       name: 'standings',
       component: () => import('../views/StandingsView.vue'),
     },
+    {
+      path: '/player/:id',
+      name: 'player',
+      component: () => import('../views/PlayerView.vue'),
+    }
   ],
 })
 
