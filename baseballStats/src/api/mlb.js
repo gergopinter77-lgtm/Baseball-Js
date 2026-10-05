@@ -57,3 +57,8 @@ export function teamLogoUrl(teamId) {
 export function getStandings(season) {
   return get(`/standings?leagueId=103,104&season=${season}&standingsTypes=regularSeason&hydrate=division,team`)
 }
+
+export function getPlayerSeason(id, season) {
+  const hydrate = `currentTeam,stats(group=[hitting,pitching],type=[season],season=${season})`
+  return get(`/people/${id}?hydrate=${hydrate}`)
+}
