@@ -1,6 +1,6 @@
 <template>
     <div class="flex justify-center">
-        <div class="relative mt-90">
+        <div class="relative mt-60">
             <input
                 v-model="query"
                 type="text"

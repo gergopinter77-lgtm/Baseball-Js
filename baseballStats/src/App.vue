@@ -1,7 +1,7 @@
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
 import Atbat from '@/components/icons/atbat.svg?component'
-
+import {} from '@/firebase.js'
 </script>
 
 <template>
@@ -11,7 +11,7 @@ import Atbat from '@/components/icons/atbat.svg?component'
         <Atbat class="w-20 h-20" />
         <div class="flex-1 flex justify-center gap-5">
           <RouterLink to="/" class="hover:text-secondary">Home</RouterLink>
-          <RouterLink to="/about" class="hover:text-secondary">About</RouterLink>
+          <RouterLink to="/login" class="hover:text-secondary">Login</RouterLink>
         </div>
       </nav>
     </div>
