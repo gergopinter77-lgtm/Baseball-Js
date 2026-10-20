@@ -16,6 +16,11 @@ export function getPlayer(id) {
   return get(`/people/${id}`)
 }
 
+// Several players at once, by id
+export function getPlayers(ids) {
+  return get(`/people?personIds=${ids.join(',')}&hydrate=currentTeam`)
+}
+
 // All MLB teams
 export function getTeams() {
   return get('/teams?sportId=1')

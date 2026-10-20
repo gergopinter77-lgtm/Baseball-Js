@@ -1,44 +1,74 @@
 <template>
-  <div>
-    <h1>Login</h1>
+  <main class="flex justify-center px-4 py-20">
+    <form @submit.prevent="submit" class="w-full max-w-md bg-primary rounded-2xl p-10 text-white shadow-xl">
+      <h1 class="text-4xl font-bold mb-2">Welcome back</h1>
+      <p class="text-primary-light mb-8">Log in to keep track of your favourite players.</p>
 
-    <div class="flex">
-        <form @submit.prevent="login">
-        <input type="email" placeholder="email" v-model="email">
-        <input type="password" placeholder="password" v-model="password">
-        <input type="submit" value="login">
-        <p v-if="error">{{ error }}</p>
-        <p>Need an account?
-            <router-link to="/register">Register here</router-link>
-        </p>
-        </form>
-    </div>
-  </div>
+      <label class="block text-primary-light mb-2" for="email">Email</label>
+      <input
+        id="email"
+        v-model="email"
+        type="email"
+        required
+        autocomplete="email"
+        placeholder="you@example.com"
+        class="w-full h-14 rounded-lg bg-primary-gradient border border-white/10 px-4 text-lg mb-5 placeholder:text-white/30 focus:outline-none focus:border-secondary"
+      >
+
+      <label class="block text-primary-light mb-2" for="password">Password</label>
+      <input
+        id="password"
+        v-model="password"
+        type="password"
+        required
+        autocomplete="current-password"
+        placeholder="••••••••"
+        class="w-full h-14 rounded-lg bg-primary-gradient border border-white/10 px-4 text-lg mb-6 placeholder:text-white/30 focus:outline-none focus:border-secondary"
+      >
+
+      <p v-if="error" class="bg-secondary-dark/15 border border-secondary-dark/40 text-secondary rounded-lg px-4 py-3 mb-6">
+        {{ error }}
+      </p>
+
+      <button
+        type="submit"
+        :disabled="loading"
+        class="w-full h-14 rounded-lg bg-secondary-dark hover:bg-secondary text-xl font-semibold transition-colors disabled:opacity-60 hover:cursor-pointer"
+      >
+        {{ loading ? 'Logging in...' : 'Log in' }}
+      </button>
+
+      <p class="text-center text-primary-light mt-8">
+        Need an account?
+        <RouterLink to="/register" class="text-secondary hover:underline">Register here</RouterLink>
+      </p>
+    </form>
+  </main>
 </template>
 
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { signInWithEmailAndPassword } from 'firebase/auth'
-import { auth } from '@/firebase'
+import { useAuth, friendlyError } from '@/components/composables/useAuth'
 
 const router = useRouter()
+const { login } = useAuth()
 
 const email = ref('')
 const password = ref('')
 const error = ref('')
+const loading = ref(false)
 
-async function login() {
+async function submit() {
   error.value = ''
+  loading.value = true
   try {
-    await signInWithEmailAndPassword(auth, email.value, password.value)
+    await login(email.value, password.value)
     router.push('/')
   } catch (err) {
-    error.value = err.message
+    error.value = friendlyError(err)
+  } finally {
+    loading.value = false
   }
 }
 </script>
-
-<style lang="scss" scoped>
-
-</style>

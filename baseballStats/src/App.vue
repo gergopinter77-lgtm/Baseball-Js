@@ -1,7 +1,10 @@
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
 import Atbat from '@/components/icons/atbat.svg?component'
-import {} from '@/firebase.js'
+import UserMenu from '@/components/UserMenu.vue'
+import { useAuth } from '@/components/composables/useAuth'
+
+const { user, isAdmin } = useAuth()
 </script>
 
 <template>
@@ -11,8 +14,10 @@ import {} from '@/firebase.js'
         <Atbat class="w-20 h-20" />
         <div class="flex-1 flex justify-center gap-5">
           <RouterLink to="/" class="hover:text-secondary">Home</RouterLink>
-          <RouterLink to="/login" class="hover:text-secondary">Login</RouterLink>
+          <RouterLink v-if="isAdmin" to="/admin" class="hover:text-secondary">Admin</RouterLink>
+          <RouterLink v-if="!user" to="/login" class="hover:text-secondary">Login</RouterLink>
         </div>
+        <UserMenu v-if="user" />
       </nav>
     </div>
     <div class="wrapper">

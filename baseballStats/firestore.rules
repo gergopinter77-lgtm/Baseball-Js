@@ -1,0 +1,23 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAdmin() {
+      return request.auth != null &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    match /users/{uid} {
+      // You can read your own profile; admins can read everyone
+      allow read: if request.auth != null && (request.auth.uid == uid || isAdmin());
+      // New accounts can only create their own profile, and never as admin
+      allow create: if request.auth != null && request.auth.uid == uid
+                    && request.resource.data.role == 'user';
+      // You can change your own name, bio and picture, but not your role
+      allow update: if isAdmin() || (request.auth != null && request.auth.uid == uid
+                    && request.resource.data.diff(resource.data).affectedKeys()
+                         .hasOnly(['displayName', 'bio', 'photoURL']));
+      // Only admins can delete accounts
+      allow delete: if isAdmin();
+    }
+  }
+}

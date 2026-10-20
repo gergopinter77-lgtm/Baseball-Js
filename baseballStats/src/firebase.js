@@ -1,6 +1,7 @@
 // Import only the parts of Firebase we use
 import { initializeApp } from 'firebase/app'
 import { getAuth } from 'firebase/auth'
+import { getFirestore } from 'firebase/firestore'
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -13,6 +14,7 @@ const firebaseConfig = {
   measurementId: "G-9CZL8DSD0F"
 };
 
-// Start Firebase once, and share the login part with the rest of the app
+// Start Firebase once, and share the login and database parts with the rest of the app
 const app = initializeApp(firebaseConfig)
 export const auth = getAuth(app)
+export const db = getFirestore(app)
