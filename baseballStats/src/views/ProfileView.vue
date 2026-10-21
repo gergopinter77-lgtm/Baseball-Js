@@ -1,14 +1,15 @@
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import UserAvatar from '@/components/UserAvatar.vue'
 import { useAuth, friendlyError } from '@/components/composables/useAuth'
-import { useFavourites } from '@/components/composables/useFavorites'
-import { getPlayers, playerPhotoUrl } from '@/api/mlb'
+import { useFavourites, useFavouriteTeams } from '@/components/composables/useFavorites'
+import { getPlayers, playerPhotoUrl, getTeams, teamLogoUrl } from '@/api/mlb'
 
 const router = useRouter()
 const { user, profile, logout, updateMyProfile, changePassword } = useAuth()
 const { favourites, toggleFavourite } = useFavourites()
+const { favouriteTeams, toggleFavouriteTeam } = useFavouriteTeams()
 
 const PHOTO_SIZE = 160
 const BIO_MAX = 200
@@ -121,6 +122,18 @@ watch(favourites, async (ids) => {
   }
 }, { immediate: true })
 
+// Only 30 teams, so load them all once and pick the favourites
+const allTeams = ref([])
+const favouriteTeamList = computed(() => allTeams.value.filter((t) => favouriteTeams.value.includes(t.id)))
+
+onMounted(async () => {
+  try {
+    allTeams.value = (await getTeams()).teams ?? []
+  } catch {
+    allTeams.value = []
+  }
+})
+
 async function handleLogout() {
   await logout()
   router.push('/login')
@@ -128,12 +141,12 @@ async function handleLogout() {
 </script>
 
 <template>
-  <main class="mx-4 md:mx-20 py-12 grid grid-cols-12 gap-8 text-white items-start">
+  <main class="page grid grid-cols-12 gap-6 items-start">
     <!-- Profile card -->
-    <form class="col-span-12 lg:col-span-4 bg-primary rounded-2xl p-8" @submit.prevent="saveProfile">
+    <form class="col-span-12 lg:col-span-4 card p-6" @submit.prevent="saveProfile">
       <div class="flex flex-col items-center text-center">
         <button type="button" class="relative group rounded-full hover:cursor-pointer" @click="fileInput.click()">
-          <UserAvatar :photo="photo" :name="name || user.email" class="w-36 h-36 text-6xl" />
+          <UserAvatar :photo="photo" :name="name || user.email" class="w-28 h-28 text-5xl" />
           <span class="absolute inset-0 rounded-full bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-sm font-semibold">
             Change picture
           </span>
@@ -142,69 +155,69 @@ async function handleLogout() {
         <button v-if="photo" type="button" class="text-sm text-primary-light hover:text-secondary mt-3 hover:cursor-pointer" @click="photo = ''">
           Remove picture
         </button>
-        <p class="text-primary-light mt-3">{{ user.email }}</p>
+        <p class="text-sm text-primary-light mt-2">{{ user.email }}</p>
       </div>
 
-      <label class="block text-primary-light mt-8 mb-2" for="name">Username</label>
+      <label class="label mt-8" for="name">Username</label>
       <input
         id="name"
         v-model="name"
         type="text"
         required
-        class="w-full h-12 rounded-lg bg-primary-gradient border border-white/10 px-4 focus:outline-none focus:border-secondary"
+        class="input"
       >
 
-      <label class="block text-primary-light mt-5 mb-2" for="bio">Bio</label>
+      <label class="label mt-5" for="bio">Bio</label>
       <textarea
         id="bio"
         v-model="bio"
         rows="4"
         :maxlength="BIO_MAX"
         placeholder="Tell people about yourself and your team..."
-        class="w-full rounded-lg bg-primary-gradient border border-white/10 px-4 py-3 resize-none placeholder:text-white/30 focus:outline-none focus:border-secondary"
+        class="input h-auto! py-3 resize-none"
       ></textarea>
-      <p class="text-right text-sm text-primary-light">{{ bio.length }}/{{ BIO_MAX }}</p>
+      <p class="text-right text-xs text-primary-light mt-1">{{ bio.length }}/{{ BIO_MAX }}</p>
 
-      <p v-if="profileError" class="bg-secondary-dark/15 border border-secondary-dark/40 text-secondary rounded-lg px-4 py-3 mt-4">{{ profileError }}</p>
-      <p v-if="profileMessage" class="bg-green-500/15 border border-green-500/40 text-green-300 rounded-lg px-4 py-3 mt-4">{{ profileMessage }}</p>
+      <p v-if="profileError" class="alert-error mt-4">{{ profileError }}</p>
+      <p v-if="profileMessage" class="alert-success mt-4">{{ profileMessage }}</p>
 
       <button
         type="submit"
         :disabled="savingProfile"
-        class="w-full h-12 rounded-lg bg-secondary-dark hover:bg-secondary font-semibold mt-5 disabled:opacity-60 hover:cursor-pointer"
+        class="btn-primary w-full mt-5"
       >
         {{ savingProfile ? 'Saving...' : 'Save profile' }}
       </button>
       <button
         type="button"
-        class="w-full h-12 rounded-lg bg-white/10 hover:bg-white/20 mt-3 hover:cursor-pointer"
+        class="btn-ghost w-full mt-3"
         @click="handleLogout"
       >
         Log out
       </button>
     </form>
 
-    <div class="col-span-12 lg:col-span-8 flex flex-col gap-8">
+    <div class="col-span-12 lg:col-span-8 flex flex-col gap-6">
       <!-- Favourites -->
-      <section class="bg-primary rounded-2xl p-8">
-        <h2 class="text-3xl font-bold mb-6">Favourite players</h2>
-        <p v-if="loadingFavourites && !favouritePlayers.length" class="text-primary-light">Loading favourites...</p>
-        <p v-else-if="!favouritePlayers.length" class="text-primary-light">
+      <section class="card p-6">
+        <h2 class="text-2xl font-semibold mb-4">Favourite players</h2>
+        <p v-if="loadingFavourites && !favouritePlayers.length" class="text-sm text-primary-light">Loading favourites...</p>
+        <p v-else-if="!favouritePlayers.length" class="text-sm text-primary-light">
           No favourites yet. Open a player and press the ★ to add them here.
         </p>
-        <div v-else class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-          <div v-for="p in favouritePlayers" :key="p.id" class="relative bg-primary-gradient rounded-xl overflow-hidden hover:ring-2 hover:ring-secondary">
+        <div v-else class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3">
+          <div v-for="p in favouritePlayers" :key="p.id" class="relative bg-primary-raised/60 rounded-lg overflow-hidden ring-1 ring-white/5 hover:ring-secondary transition-shadow">
             <RouterLink :to="{ name: 'player', params: { id: p.id } }" class="block">
-              <img :src="playerPhotoUrl(p.id)" :alt="p.fullName" class="w-full aspect-square object-cover object-top bg-white/10">
+              <img :src="playerPhotoUrl(p.id, 300)" :alt="p.fullName" class="w-full aspect-[4/5] object-cover bg-white/10">
               <div class="p-3">
-                <p class="font-semibold truncate">{{ p.fullName }}</p>
-                <p class="text-sm text-primary-light truncate">
+                <p class="text-sm font-semibold truncate">{{ p.fullName }}</p>
+                <p class="text-xs text-primary-light truncate">
                   {{ p.primaryPosition?.abbreviation }}<template v-if="p.currentTeam"> · {{ p.currentTeam.name }}</template>
                 </p>
               </div>
             </RouterLink>
             <button
-              class="absolute top-2 right-2 w-9 h-9 rounded-full bg-black/50 hover:bg-black/70 text-yellow-300 text-xl hover:cursor-pointer"
+              class="absolute top-2 right-2 w-8 h-8 rounded-full bg-black/50 hover:bg-black/70 text-yellow-300 hover:cursor-pointer"
               title="Remove from favourites"
               @click="toggleFavourite(p.id)"
             >
@@ -214,23 +227,53 @@ async function handleLogout() {
         </div>
       </section>
 
+      <!-- Favourite teams -->
+      <section class="card p-6">
+        <h2 class="text-2xl font-semibold mb-4">Favourite teams</h2>
+        <p v-if="!favouriteTeamList.length" class="text-sm text-primary-light">
+          No favourite teams yet. Open a team and press the ★ to add it here.
+        </p>
+        <div v-else class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+          <div
+            v-for="t in favouriteTeamList"
+            :key="t.id"
+            class="flex items-center gap-3 bg-primary-raised/60 rounded-lg p-3 ring-1 ring-white/5 hover:ring-secondary transition-shadow"
+          >
+            <RouterLink :to="{ name: 'team', params: { id: t.id } }" class="flex-1 flex items-center gap-3 min-w-0">
+              <img :src="teamLogoUrl(t.id)" alt="" class="w-10 h-10 shrink-0">
+              <div class="min-w-0">
+                <p class="text-sm font-semibold truncate">{{ t.name }}</p>
+                <p class="text-xs text-primary-light truncate">{{ t.division?.name }}</p>
+              </div>
+            </RouterLink>
+            <button
+              class="w-8 h-8 rounded-full bg-black/30 hover:bg-black/60 text-yellow-300 shrink-0 hover:cursor-pointer"
+              title="Remove from favourites"
+              @click="toggleFavouriteTeam(t.id)"
+            >
+              ★
+            </button>
+          </div>
+        </div>
+      </section>
+
       <!-- Password -->
-      <form class="bg-primary rounded-2xl p-8" @submit.prevent="savePassword">
-        <h2 class="text-3xl font-bold mb-6">Change password</h2>
-        <div class="grid grid-cols-12 gap-5">
+      <form class="card p-6" @submit.prevent="savePassword">
+        <h2 class="text-2xl font-semibold mb-4">Change password</h2>
+        <div class="grid grid-cols-12 gap-4">
           <div class="col-span-12 md:col-span-4">
-            <label class="block text-primary-light mb-2" for="current-password">Current password</label>
+            <label class="label" for="current-password">Current password</label>
             <input
               id="current-password"
               v-model="currentPassword"
               type="password"
               required
               autocomplete="current-password"
-              class="w-full h-12 rounded-lg bg-primary-gradient border border-white/10 px-4 focus:outline-none focus:border-secondary"
+              class="input"
             >
           </div>
           <div class="col-span-12 md:col-span-4">
-            <label class="block text-primary-light mb-2" for="new-password">New password</label>
+            <label class="label" for="new-password">New password</label>
             <input
               id="new-password"
               v-model="newPassword"
@@ -238,11 +281,11 @@ async function handleLogout() {
               required
               minlength="6"
               autocomplete="new-password"
-              class="w-full h-12 rounded-lg bg-primary-gradient border border-white/10 px-4 focus:outline-none focus:border-secondary"
+              class="input"
             >
           </div>
           <div class="col-span-12 md:col-span-4">
-            <label class="block text-primary-light mb-2" for="confirm-password">Repeat new password</label>
+            <label class="label" for="confirm-password">Repeat new password</label>
             <input
               id="confirm-password"
               v-model="confirmPassword"
@@ -250,18 +293,18 @@ async function handleLogout() {
               required
               minlength="6"
               autocomplete="new-password"
-              class="w-full h-12 rounded-lg bg-primary-gradient border border-white/10 px-4 focus:outline-none focus:border-secondary"
+              class="input"
             >
           </div>
         </div>
 
-        <p v-if="passwordError" class="bg-secondary-dark/15 border border-secondary-dark/40 text-secondary rounded-lg px-4 py-3 mt-5">{{ passwordError }}</p>
-        <p v-if="passwordMessage" class="bg-green-500/15 border border-green-500/40 text-green-300 rounded-lg px-4 py-3 mt-5">{{ passwordMessage }}</p>
+        <p v-if="passwordError" class="alert-error mt-5">{{ passwordError }}</p>
+        <p v-if="passwordMessage" class="alert-success mt-5">{{ passwordMessage }}</p>
 
         <button
           type="submit"
           :disabled="savingPassword"
-          class="px-6 h-12 rounded-lg bg-secondary-dark hover:bg-secondary font-semibold mt-5 disabled:opacity-60 hover:cursor-pointer"
+          class="btn-primary mt-5"
         >
           {{ savingPassword ? 'Changing...' : 'Change password' }}
         </button>

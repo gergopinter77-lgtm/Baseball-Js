@@ -1,16 +1,16 @@
 <template>
-    <div class="p-6 rounded-xl bg-primary text-center">
-        <p v-if="loading">Loading...</p>
-        <p v-else-if="error">{{ error }}</p>
+    <div class="card p-4 md:p-6 text-center h-full flex flex-col items-center justify-center min-h-64">
+        <p v-if="loading" class="text-primary-light">Loading...</p>
+        <p v-else-if="error" class="text-secondary">{{ error }}</p>
 
         <template v-else-if="player">
             <img
                 :src="playerPhotoUrl(player.id)"
                 :alt="player.fullName"
-                class="w-80 h-100 mx-auto object-cover object-top rounded-xl"
+                class="w-full max-w-52 aspect-[4/5] object-cover rounded-xl bg-white/10"
             />
-            <h2 class="mt-4 text-3xl font-bold">{{ player.fullName }}</h2>
-            <p class="text-primary-light">
+            <h2 class="mt-4 text-2xl md:text-3xl font-bold">{{ player.fullName }}</h2>
+            <p class="text-sm text-primary-light">
                 {{ player.primaryPosition?.abbreviation }} · {{ player.currentTeam?.name }}
             </p>
         </template>

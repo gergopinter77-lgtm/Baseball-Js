@@ -1,10 +1,12 @@
 <template>
-    <main class="grid grid-cols-12 gap-6 mx-20 py-12 text-white">
+    <main class="page grid grid-cols-12 gap-4 md:gap-6">
+        <h1 class="col-span-12 text-4xl font-bold">Compare players</h1>
+
         <!-- Row 1: two search boxes -->
-        <div class="col-span-6">
+        <div class="col-span-12 md:col-span-6">
             <PlayerSearch placeholder="Player A..." @select="(player) => pick('a', player)" />
         </div>
-        <div class="col-span-6">
+        <div class="col-span-12 md:col-span-6">
             <PlayerSearch placeholder="Player B..." @select="(player) => pick('b', player)" />
         </div>
 
@@ -17,28 +19,30 @@
         </div>
 
         <!-- Row 3: the comparison table (or a message) -->
-        <p v-if="message" class="col-span-12 text-center text-2xl text-primary-light">{{ message }}</p>
+        <p v-if="message" class="col-span-12 text-center text-primary-light py-4">{{ message }}</p>
 
-        <table v-else class="col-span-12 rounded-xl overflow-hidden bg-primary text-xl text-center">
-            <thead>
-                <tr>
-                    <th class="px-4 py-3">{{ a.player.fullName }}</th>
-                    <th class="px-4 py-3">Stat</th>
-                    <th class="px-4 py-3">{{ b.player.fullName }}</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="row in rows" :key="row.key" class="border-t border-white/10">
-                    <td class="px-4 py-3" :class="{ 'text-secondary font-bold': row.winner === 'a' }">
-                        {{ row.valueA ?? '–' }}
-                    </td>
-                    <td class="px-4 py-3 text-primary-light">{{ row.name }}</td>
-                    <td class="px-4 py-3" :class="{ 'text-secondary font-bold': row.winner === 'b' }">
-                        {{ row.valueB ?? '–' }}
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        <div v-else class="col-span-12 card overflow-hidden">
+            <table class="w-full text-center">
+                <thead class="bg-primary-raised/60">
+                    <tr>
+                        <th class="th w-2/5 text-sm! normal-case! tracking-normal! text-white!">{{ a.player.fullName }}</th>
+                        <th class="th">Stat</th>
+                        <th class="th w-2/5 text-sm! normal-case! tracking-normal! text-white!">{{ b.player.fullName }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="row in rows" :key="row.key" class="border-t border-white/5">
+                        <td class="td text-lg" :class="row.winner === 'a' ? 'text-secondary font-semibold' : ''">
+                            {{ row.valueA ?? '–' }}
+                        </td>
+                        <td class="td text-sm text-primary-light">{{ row.name }}</td>
+                        <td class="td text-lg" :class="row.winner === 'b' ? 'text-secondary font-semibold' : ''">
+                            {{ row.valueB ?? '–' }}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </main>
 </template>
 

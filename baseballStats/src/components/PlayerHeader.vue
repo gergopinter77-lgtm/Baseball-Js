@@ -1,28 +1,34 @@
 <template>
-    <section class="col-span-12 grid grid-cols-subgrid items-center">
+    <section class="col-span-12 flex flex-col sm:flex-row sm:items-center gap-6">
         <img
             :src="playerPhotoUrl(player.id)"
             :alt="player.fullName"
-            class="col-span-2 w-full h-60 aspect-square object-cover object-top rounded-2xl bg-white/10"
+            class="w-36 md:w-44 aspect-[4/5] object-cover rounded-xl bg-white/10 shrink-0"
         />
 
-        <div class="col-span-7">
-            <h1 class="text-4xl font-bold">
-                {{ player.fullName }} &nbsp;-&nbsp; {{ player.primaryPosition?.abbreviation }}
-            </h1>
-            <div v-if="player.currentTeam" class="flex items-center gap-5 mt-8 text-2xl font-semibold">
-                <img :src="teamLogoUrl(player.currentTeam.id)" alt="" class="w-14 h-14" />
-                <span>{{ player.currentTeam.name }}</span>
+        <div class="flex-1 min-w-0">
+            <div class="flex flex-wrap items-baseline gap-x-3">
+                <h1 class="text-4xl md:text-5xl font-bold">{{ player.fullName }}</h1>
+                <span class="font-display text-2xl font-semibold text-secondary">{{ player.primaryPosition?.abbreviation }}</span>
             </div>
-            <p class="mt-5 text-xl text-primary-light">{{ playerInfoLine(player) }}</p>
+            <RouterLink
+                v-if="player.currentTeam"
+                :to="{ name: 'team', params: { id: player.currentTeam.id } }"
+                class="inline-flex items-center gap-2.5 mt-3 text-lg font-medium hover:text-secondary"
+            >
+                <img :src="teamLogoUrl(player.currentTeam.id)" alt="" class="w-7 h-7" />
+                <span>{{ player.currentTeam.name }}</span>
+            </RouterLink>
+            <p class="mt-3 text-sm text-primary-light leading-relaxed">{{ playerInfoLine(player) }}</p>
         </div>
 
         <button
-            class="col-span-2 col-start-10 bg-secondary hover:bg-secondary-dark rounded-xl my-23 px-7 py-5 text-2xl font-semibold flex items-center justify-between hover:cursor-pointer"
+            class="self-start sm:self-center"
+            :class="isFavourite(player.id) ? 'btn-primary' : 'btn-ghost'"
             @click="toggleFavourite(player.id)"
         >
-            Favourite
-            <span class="text-2xl" :class="isFavourite(player.id) ? 'text-yellow-300' : 'text-primary'">★</span>
+            <span :class="isFavourite(player.id) ? 'text-yellow-300' : 'text-primary-light'">★</span>
+            {{ isFavourite(player.id) ? 'Favourited' : 'Add to favourites' }}
         </button>
     </section>
 </template>

@@ -4,25 +4,28 @@
             v-model="query"
             type="text"
             :placeholder="placeholder"
-            class="w-full p-4 text-xl rounded-lg bg-secondary text-white placeholder:text-white/70"
+            class="input h-12!"
         />
 
-        <ul v-if="isOpen" class="absolute top-full left-0 right-0 z-10 mt-2 rounded-lg overflow-hidden bg-secondary">
-            <li v-if="loading && !results.length" class="px-4 py-3">Searching...</li>
-            <li v-else-if="error" class="px-4 py-3">{{ error }}</li>
+        <ul v-if="isOpen" class="absolute top-full left-0 right-0 z-10 mt-2 card shadow-2xl overflow-hidden">
+            <li v-if="loading && !results.length" class="px-4 py-3 text-primary-light">Searching...</li>
+            <li v-else-if="error" class="px-4 py-3 text-secondary">{{ error }}</li>
             <li
                 v-for="p in results"
                 :key="p.id"
-                class="px-4 py-3 cursor-pointer hover:bg-secondary-dark"
+                class="flex items-center gap-3 px-4 py-2.5 cursor-pointer hover:bg-white/5"
                 @click="pick(p)"
             >
-                {{ p.fullName }} – {{ p.primaryPosition?.abbreviation }}
+                <img :src="playerPhotoUrl(p.id, 80)" alt="" class="w-8 aspect-[4/5] rounded-md object-cover bg-white/10" />
+                <span class="flex-1">{{ p.fullName }}</span>
+                <span class="text-xs font-semibold text-primary-light">{{ p.primaryPosition?.abbreviation }}</span>
             </li>
         </ul>
     </div>
 </template>
 
 <script setup>
+import { playerPhotoUrl } from '@/api/mlb'
 import { usePlayerSearch } from './composables/usePlayerSearch'
 
 defineProps({

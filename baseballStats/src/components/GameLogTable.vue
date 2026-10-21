@@ -1,44 +1,41 @@
 <template>
     <div class="overflow-x-auto">
-        <table class="w-full text-left whitespace-nowrap text-xl">
-            <thead class="text-primary-light text-lg">
+        <table class="w-full text-left whitespace-nowrap text-sm">
+            <thead>
                 <tr>
-                    <th class="py-4 px-3 font-normal">Date</th>
-                    <th class="py-4 px-3 font-normal">Opponent</th>
-                    <th class="py-4 px-3 font-normal">Result</th>
-                    <th v-for="col in columns" :key="col.key" class="py-4 px-3 font-normal text-right">
+                    <th class="th">Date</th>
+                    <th class="th">Opponent</th>
+                    <th class="th">Result</th>
+                    <th v-for="col in columns" :key="col.key" class="th text-right">
                         {{ col.label }}
                     </th>
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="game in games" :key="game.gamePk" class="border-t border-white/10">
-                    <td class="py-4 px-3 text-primary-light">{{ formatDate(game.date) }}</td>
-                    <td class="py-4 px-3">
-                        <div class="flex items-center gap-3">
-                            <span class="text-primary-light w-7">{{ game.isHome ? 'vs' : '@' }}</span>
-                            <img :src="teamLogoUrl(game.opponent.id)" alt="" class="w-9 h-9" />
+                <tr v-for="game in games" :key="game.gamePk" class="border-t border-white/5 hover:bg-white/3">
+                    <td class="td text-primary-light">{{ formatDate(game.date) }}</td>
+                    <td class="td">
+                        <div class="flex items-center gap-2">
+                            <span class="text-primary-light w-5 text-xs">{{ game.isHome ? 'vs' : '@' }}</span>
+                            <img :src="teamLogoUrl(game.opponent.id)" alt="" class="w-6 h-6" />
                             <span>{{ game.opponent.name }}</span>
                         </div>
                     </td>
-                    <td class="py-4 px-3">
-                        <span
-                            v-if="game.result"
-                            class="inline-block min-w-24 text-center rounded-full px-4 py-1 text-lg font-semibold"
-                            :class="game.result === 'W' ? 'bg-green-600' : 'bg-secondary'"
-                        >
-                            {{ game.result }} {{ game.score }}
+                    <td class="td">
+                        <span v-if="game.result" class="font-semibold">
+                            <span :class="game.result === 'W' ? 'text-emerald-400' : 'text-secondary'">{{ game.result }}</span>
+                            {{ game.score }}
                         </span>
                         <span v-else class="text-primary-light">–</span>
                     </td>
-                    <td v-for="col in columns" :key="col.key" class="py-4 px-3 text-right">
+                    <td v-for="col in columns" :key="col.key" class="td text-right">
                         {{ game.stat[col.key] ?? '–' }}
                     </td>
                 </tr>
             </tbody>
         </table>
 
-        <p v-if="!games.length" class="py-10 text-center text-2xl text-primary-light">No games yet this season.</p>
+        <p v-if="!games.length" class="py-8 text-center text-primary-light">No games yet this season.</p>
     </div>
 </template>
 

@@ -89,74 +89,74 @@ async function confirmDelete() {
 </script>
 
 <template>
-  <main class="mx-4 md:mx-20 py-12 text-white">
-    <div class="flex flex-wrap items-end justify-between gap-4 mb-8">
+  <main class="page">
+    <div class="flex flex-wrap items-end justify-between gap-4 mb-6">
       <div>
         <h1 class="text-4xl font-bold">Admin panel</h1>
-        <p class="text-primary-light mt-1">Manage every account in AtBat.</p>
+        <p class="text-sm text-primary-light mt-1">Manage every account in AtBat.</p>
       </div>
       <input
         v-model="search"
         type="text"
         placeholder="Search name or email..."
-        class="w-full md:w-80 h-12 rounded-lg bg-primary border border-white/10 px-4 placeholder:text-white/40 focus:outline-none focus:border-secondary"
+        class="input md:w-80! bg-primary!"
       >
     </div>
 
-    <div class="grid grid-cols-12 gap-6 mb-8">
-      <div class="col-span-6 md:col-span-3 bg-primary rounded-2xl p-6">
-        <p class="text-primary-light">Accounts</p>
-        <p class="text-4xl font-bold mt-1">{{ accounts.length }}</p>
+    <div class="grid grid-cols-12 gap-4 mb-6">
+      <div class="col-span-6 md:col-span-3 card p-5">
+        <p class="text-xs font-semibold uppercase tracking-wider text-primary-light">Accounts</p>
+        <p class="font-display text-4xl font-semibold mt-1">{{ accounts.length }}</p>
       </div>
-      <div class="col-span-6 md:col-span-3 bg-primary rounded-2xl p-6">
-        <p class="text-primary-light">Admins</p>
-        <p class="text-4xl font-bold mt-1">{{ adminCount }}</p>
+      <div class="col-span-6 md:col-span-3 card p-5">
+        <p class="text-xs font-semibold uppercase tracking-wider text-primary-light">Admins</p>
+        <p class="font-display text-4xl font-semibold mt-1">{{ adminCount }}</p>
       </div>
     </div>
 
-    <p v-if="error && !editing && !deleting" class="bg-secondary-dark/15 border border-secondary-dark/40 text-secondary rounded-lg px-4 py-3 mb-6">
+    <p v-if="error && !editing && !deleting" class="alert-error mb-6">
       {{ error }}
     </p>
 
-    <section class="bg-primary rounded-2xl p-6 md:p-8 overflow-x-auto">
+    <section class="card p-5 overflow-x-auto">
       <p v-if="loading" class="text-primary-light py-6 text-center">Loading accounts...</p>
       <p v-else-if="!filtered.length" class="text-primary-light py-6 text-center">No accounts found.</p>
 
-      <table v-else class="w-full text-lg">
+      <table v-else class="w-full text-sm text-left whitespace-nowrap">
         <thead>
-          <tr class="text-primary-light text-left">
-            <th class="pb-3 font-normal">Name</th>
-            <th class="pb-3 font-normal">Email</th>
-            <th class="pb-3 font-normal">Role</th>
-            <th class="pb-3 font-normal">Joined</th>
-            <th class="pb-3"></th>
+          <tr>
+            <th class="th">Name</th>
+            <th class="th">Email</th>
+            <th class="th">Role</th>
+            <th class="th">Joined</th>
+            <th class="th"></th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="a in filtered" :key="a.id" class="border-t border-white/10">
-            <td class="py-4 pr-4">
+          <tr v-for="a in filtered" :key="a.id" class="border-t border-white/5 hover:bg-white/3">
+            <td class="td">
               <div class="flex items-center gap-3">
-                <UserAvatar :photo="a.photoURL" :name="a.displayName || a.email" class="w-10 h-10" />
-                <span>{{ a.displayName || '—' }}</span>
+                <UserAvatar :photo="a.photoURL" :name="a.displayName || a.email" class="w-8 h-8 text-sm" />
+                <span class="font-medium">{{ a.displayName || '—' }}</span>
                 <span v-if="isMe(a)" class="text-xs text-primary-light">(you)</span>
               </div>
             </td>
-            <td class="py-4 pr-4 text-primary-light">{{ a.email }}</td>
-            <td class="py-4 pr-4">
+            <td class="td text-primary-light">{{ a.email }}</td>
+            <td class="td">
               <span
-                class="px-3 py-1 rounded-full text-sm font-semibold"
+                class="px-2.5 py-0.5 rounded-full text-xs font-semibold"
                 :class="a.role === 'admin' ? 'bg-secondary-dark/20 text-secondary' : 'bg-white/10 text-white/80'"
               >
                 {{ a.role === 'admin' ? 'Admin' : 'User' }}
               </span>
             </td>
-            <td class="py-4 pr-4 text-primary-light">{{ formatDate(a.createdAt) }}</td>
-            <td class="py-4 text-right whitespace-nowrap">
-              <button class="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 mr-2 hover:cursor-pointer" @click="openEdit(a)">
+            <td class="td text-primary-light">{{ formatDate(a.createdAt) }}</td>
+            <td class="td text-right">
+              <button class="btn-ghost h-9! px-3! text-sm mr-2" @click="openEdit(a)">
                 Edit
               </button>
               <button
-                class="px-4 py-2 rounded-lg bg-secondary-dark hover:bg-secondary hover:cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                class="btn-primary h-9! px-3! text-sm"
                 :disabled="isMe(a)"
                 :title="isMe(a) ? 'You cannot delete your own account' : ''"
                 @click="error = ''; deleting = a"
@@ -171,40 +171,40 @@ async function confirmDelete() {
 
     <!-- Edit window -->
     <div v-if="editing" class="fixed inset-0 bg-black/60 flex items-center justify-center px-4 z-20" @click.self="editing = null">
-      <form class="w-full max-w-md bg-primary rounded-2xl p-8" @submit.prevent="saveEdit">
-        <h2 class="text-2xl font-bold mb-1">Edit account</h2>
+      <form class="w-full max-w-md card p-6" @submit.prevent="saveEdit">
+        <h2 class="text-2xl font-semibold mb-1">Edit account</h2>
         <p class="text-primary-light mb-6">{{ editing.email }}</p>
 
-        <label class="block text-primary-light mb-2" for="edit-name">Name</label>
+        <label class="label" for="edit-name">Name</label>
         <input
           id="edit-name"
           v-model="editing.displayName"
           type="text"
           required
-          class="w-full h-12 rounded-lg bg-primary-gradient border border-white/10 px-4 mb-5 focus:outline-none focus:border-secondary"
+          class="input mb-5"
         >
 
-        <label class="block text-primary-light mb-2" for="edit-role">Role</label>
+        <label class="label" for="edit-role">Role</label>
         <select
           id="edit-role"
           v-model="editing.role"
           :disabled="isMe(editing)"
-          class="w-full h-12 rounded-lg bg-primary-gradient border border-white/10 px-4 mb-2 focus:outline-none focus:border-secondary disabled:opacity-50"
+          class="input mb-2"
         >
           <option value="user">User</option>
           <option value="admin">Admin</option>
         </select>
         <p v-if="isMe(editing)" class="text-sm text-primary-light mb-4">You cannot change your own role.</p>
 
-        <p v-if="error" class="bg-secondary-dark/15 border border-secondary-dark/40 text-secondary rounded-lg px-4 py-3 my-4">
+        <p v-if="error" class="alert-error my-4">
           {{ error }}
         </p>
 
         <div class="flex justify-end gap-3 mt-6">
-          <button type="button" class="px-5 py-3 rounded-lg bg-white/10 hover:bg-white/20 hover:cursor-pointer" @click="editing = null">
+          <button type="button" class="btn-ghost" @click="editing = null">
             Cancel
           </button>
-          <button type="submit" :disabled="saving" class="px-5 py-3 rounded-lg bg-secondary-dark hover:bg-secondary font-semibold disabled:opacity-60 hover:cursor-pointer">
+          <button type="submit" :disabled="saving" class="btn-primary">
             {{ saving ? 'Saving...' : 'Save changes' }}
           </button>
         </div>
@@ -213,22 +213,22 @@ async function confirmDelete() {
 
     <!-- Delete confirm -->
     <div v-if="deleting" class="fixed inset-0 bg-black/60 flex items-center justify-center px-4 z-20" @click.self="deleting = null">
-      <div class="w-full max-w-md bg-primary rounded-2xl p-8">
-        <h2 class="text-2xl font-bold mb-3">Delete account?</h2>
+      <div class="w-full max-w-md card p-6">
+        <h2 class="text-2xl font-semibold mb-2">Delete account?</h2>
         <p class="text-primary-light mb-6">
           <span class="text-white">{{ deleting.displayName || deleting.email }}</span>
           will be removed and won't be able to log in anymore.
         </p>
 
-        <p v-if="error" class="bg-secondary-dark/15 border border-secondary-dark/40 text-secondary rounded-lg px-4 py-3 mb-6">
+        <p v-if="error" class="alert-error mb-6">
           {{ error }}
         </p>
 
         <div class="flex justify-end gap-3">
-          <button class="px-5 py-3 rounded-lg bg-white/10 hover:bg-white/20 hover:cursor-pointer" @click="deleting = null">
+          <button class="btn-ghost" @click="deleting = null">
             Cancel
           </button>
-          <button :disabled="saving" class="px-5 py-3 rounded-lg bg-secondary-dark hover:bg-secondary font-semibold disabled:opacity-60 hover:cursor-pointer" @click="confirmDelete">
+          <button :disabled="saving" class="btn-primary" @click="confirmDelete">
             {{ saving ? 'Deleting...' : 'Delete' }}
           </button>
         </div>

@@ -6,7 +6,7 @@
             title="Account"
             @click="open = !open"
         >
-            <UserAvatar :photo="profile?.photoURL" :name="displayName" class="w-12 h-12 text-xl" />
+            <UserAvatar :photo="profile?.photoURL" :name="displayName" class="w-9 h-9 text-base" />
         </button>
 
         <!-- Clicking anywhere outside the menu closes it -->
@@ -14,7 +14,7 @@
 
         <div
             v-if="open"
-            class="absolute right-0 top-full mt-3 w-64 bg-primary-gradient border border-white/10 rounded-xl shadow-xl z-30 overflow-hidden text-base"
+            class="absolute right-0 top-full mt-3 w-64 card shadow-2xl z-30 overflow-hidden text-sm"
         >
             <div class="flex items-center gap-3 px-4 py-4 border-b border-white/10">
                 <UserAvatar :photo="profile?.photoURL" :name="displayName" class="w-10 h-10" />

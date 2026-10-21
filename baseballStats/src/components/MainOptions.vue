@@ -1,14 +1,23 @@
 <template>
-    <div class="flex justify-center mt-2">
-        <RouterLink to="/compare" class="bg-secondary-dark w-79 h-16 mr-1 rounded-lg hover:cursor-pointer hover:bg-secondary-dark flex justify-center items-center text-white text-xl">Compare</RouterLink>
-        <RouterLink to="/standings" class="bg-secondary-dark w-79 h-16 ml-1 rounded-lg hover:cursor-pointer hover:bg-secondary-dark flex justify-center items-center text-white text-xl">Standings</RouterLink>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-2xl mt-6">
+        <RouterLink
+            v-for="option in options"
+            :key="option.to"
+            :to="option.to"
+            class="card p-5 flex items-center justify-between group hover:border-secondary/50 hover:bg-primary-raised transition-colors"
+        >
+            <div>
+                <p class="font-display text-2xl font-semibold tracking-wide">{{ option.title }}</p>
+                <p class="text-sm text-primary-light">{{ option.text }}</p>
+            </div>
+            <span class="text-secondary text-xl transition-transform group-hover:translate-x-1">→</span>
+        </RouterLink>
     </div>
 </template>
 
 <script setup>
-
+const options = [
+    { to: '/compare', title: 'Compare', text: 'Two players side by side' },
+    { to: '/standings', title: 'Standings', text: 'Divisions and the postseason' },
+]
 </script>
-
-<style scoped>
-
-</style>

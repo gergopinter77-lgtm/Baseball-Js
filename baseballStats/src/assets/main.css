@@ -1,11 +1,84 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #0A2459;
-  --color-primary-light: #8E94B8;
-  --color-secondary: #F94B66;
-  --color-secondary-dark: #F20530;
-  --color-white: #F2F2F2;
-  --color-primary-gradient: #111D40;
-  --color-text-nav: #8E94B8;
+  /* Fonts: Inter for text and numbers, Barlow Condensed for headings and big stats */
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Barlow Condensed", "Inter", ui-sans-serif, sans-serif;
+
+  /* Surfaces, darkest to lightest */
+  --color-primary-gradient: #0A1328; /* page background */
+  --color-primary: #121F3D;          /* cards */
+  --color-primary-raised: #1A2A4F;   /* things inside cards, inputs */
+
+  /* Text */
+  --color-white: #EEF1F7;
+  --color-primary-light: #8F9BBA;    /* muted text, labels */
+  --color-text-nav: #A9B3CE;
+
+  /* Accent (baseball red) */
+  --color-secondary: #F0596A;        /* hover, accent text */
+  --color-secondary-dark: #D7263D;   /* buttons, highlights */
+}
+
+@layer base {
+  html {
+    @apply bg-primary-gradient text-white font-sans antialiased;
+  }
+
+  h1, h2, h3 {
+    @apply font-display tracking-wide;
+  }
+
+  /* Numbers line up in columns */
+  table {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@utility page {
+  @apply max-w-7xl mx-auto px-4 md:px-8 py-8 md:py-10;
+}
+
+@utility card {
+  @apply bg-primary rounded-xl border border-white/5;
+}
+
+@utility input {
+  @apply w-full h-11 rounded-lg bg-primary-raised border border-white/10 px-4 text-base text-white
+    placeholder:text-white/35 transition-colors
+    focus:outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20;
+}
+
+@utility label {
+  @apply block text-sm font-medium text-primary-light mb-1.5;
+}
+
+@utility btn {
+  @apply inline-flex items-center justify-center gap-2 h-11 px-5 rounded-lg font-semibold
+    transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed;
+}
+
+@utility btn-primary {
+  @apply btn bg-secondary-dark text-white hover:bg-secondary;
+}
+
+@utility btn-ghost {
+  @apply btn bg-white/8 text-white hover:bg-white/15;
+}
+
+@utility alert-error {
+  @apply rounded-lg border border-secondary-dark/40 bg-secondary-dark/10 px-4 py-3 text-sm text-secondary;
+}
+
+@utility alert-success {
+  @apply rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-300;
+}
+
+/* Small uppercase table headers like on stats sites */
+@utility th {
+  @apply py-2.5 px-3 text-xs font-semibold uppercase tracking-wider text-primary-light;
+}
+
+@utility td {
+  @apply py-2.5 px-3;
 }

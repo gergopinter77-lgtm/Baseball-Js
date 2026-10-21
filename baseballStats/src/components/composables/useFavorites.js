@@ -1,36 +1,46 @@
 import { ref } from 'vue'
 
-const STORAGE_KEY = 'favourites'
+// One saved list of ids (players or teams), kept in the browser
+function createFavouriteList(storageKey) {
+    // Created once, outside the use functions, so every component shares the same list
+    const list = ref(read())
 
-// Created once, outside the function, so every component shares the same list
-const favourites = ref(read())
-
-function read() {
-    try {
-        return JSON.parse(localStorage.getItem(STORAGE_KEY)) ?? []
-    } catch {
-        return []
-    }
-}
-
-function save() {
-    try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(favourites.value))
-    } catch {
-    }
-}
-
-export function useFavourites() {
-    function isFavourite(id) {
-        return favourites.value.includes(id)
+    function read() {
+        try {
+            return JSON.parse(localStorage.getItem(storageKey)) ?? []
+        } catch {
+            return []
+        }
     }
 
-    function toggleFavourite(id) {
-        favourites.value = isFavourite(id)
-            ? favourites.value.filter((f) => f !== id)
-            : [...favourites.value, id]
+    function save() {
+        try {
+            localStorage.setItem(storageKey, JSON.stringify(list.value))
+        } catch {
+        }
+    }
+
+    function has(id) {
+        return list.value.includes(id)
+    }
+
+    function toggle(id) {
+        list.value = has(id)
+            ? list.value.filter((f) => f !== id)
+            : [...list.value, id]
         save()
     }
 
-    return { favourites, isFavourite, toggleFavourite }
+    return { list, has, toggle }
+}
+
+const players = createFavouriteList('favourites')
+const teams = createFavouriteList('favouriteTeams')
+
+export function useFavourites() {
+    return { favourites: players.list, isFavourite: players.has, toggleFavourite: players.toggle }
+}
+
+export function useFavouriteTeams() {
+    return { favouriteTeams: teams.list, isFavouriteTeam: teams.has, toggleFavouriteTeam: teams.toggle }
 }
