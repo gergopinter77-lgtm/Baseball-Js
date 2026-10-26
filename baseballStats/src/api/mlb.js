@@ -52,7 +52,7 @@ export function getTeamStats(id, season) {
 
 // Games on a date (YYYY-MM-DD)
 export function getSchedule(date) {
-  return get(`/schedule?sportId=1&date=${date}`)
+  return get(`/schedule?sportId=1&date=${date}&hydrate=team,probablePitcher`)
 }
 
 // Stat leaders, e.g. 'homeRuns'
@@ -98,4 +98,16 @@ export function getPostseason(season) {
 export function getPlayerSeason(id, season) {
   const hydrate = `currentTeam,stats(group=[hitting,pitching],type=[season],season=${season})`
   return get(`/people/${id}?hydrate=${hydrate}`)
+}
+
+// ---------- Match page ----------
+
+// One game with both teams, their records and the probable starting pitchers
+export function getMatch(gamePk) {
+  return get(`/schedule?gamePks=${gamePk}&hydrate=team,probablePitcher`)
+}
+
+// Every game two teams played against each other in a season (regular season + postseason)
+export function getHeadToHead(teamId, opponentId, season) {
+  return get(`/schedule?sportId=1&teamId=${teamId}&opponentId=${opponentId}&season=${season}&gameType=R,F,D,L,W&hydrate=team`)
 }

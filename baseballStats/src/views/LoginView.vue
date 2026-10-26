@@ -40,7 +40,7 @@
 
       <p class="text-center text-sm text-primary-light mt-6">
         Need an account?
-        <RouterLink to="/register" class="text-secondary font-medium hover:underline">Register here</RouterLink>
+        <RouterLink :to="{ path: '/register', query: route.query }" class="text-secondary font-medium hover:underline">Register here</RouterLink>
       </p>
     </form>
   </main>
@@ -48,9 +48,10 @@
 
 <script setup>
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { useAuth, friendlyError } from '@/components/composables/useAuth'
+import { useRoute, useRouter } from 'vue-router'
+import { useAuth, friendlyError, redirectPath } from '@/components/composables/useAuth'
 
+const route = useRoute()
 const router = useRouter()
 const { login } = useAuth()
 
@@ -64,7 +65,7 @@ async function submit() {
   loading.value = true
   try {
     await login(email.value, password.value)
-    router.push('/')
+    router.push(redirectPath(route.query))
   } catch (err) {
     error.value = friendlyError(err)
   } finally {

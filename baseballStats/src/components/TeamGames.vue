@@ -21,8 +21,11 @@
                             <td class="td"><OpponentCell :game="g" /></td>
                             <td class="td text-primary-light">{{ g.venue }}</td>
                             <td class="td text-right">
-                                <span v-if="g.state === 'Live'" class="text-emerald-400 font-semibold">● Live</span>
-                                <span v-else class="text-primary-light">{{ g.status }}</span>
+                                <RouterLink :to="{ name: 'match', params: { id: g.gamePk } }" class="hover:text-secondary">
+                                    <span v-if="g.state === 'Live'" class="text-emerald-400 font-semibold">● Live</span>
+                                    <span v-else class="text-primary-light">{{ g.status }}</span>
+                                    <span class="text-secondary ml-1.5">→</span>
+                                </RouterLink>
                             </td>
                         </tr>
                     </tbody>
@@ -49,8 +52,10 @@
                             <td class="td text-primary-light">{{ formatDate(g.date) }}</td>
                             <td class="td"><OpponentCell :game="g" /></td>
                             <td class="td font-semibold">
-                                <span :class="g.result === 'W' ? 'text-emerald-400' : 'text-secondary'">{{ g.result }}</span>
-                                {{ g.score }}
+                                <RouterLink :to="{ name: 'match', params: { id: g.gamePk } }" class="hover:underline">
+                                    <span :class="g.result === 'W' ? 'text-emerald-400' : 'text-secondary'">{{ g.result }}</span>
+                                    {{ g.score }}
+                                </RouterLink>
                             </td>
                             <td class="td text-right text-primary-light">{{ g.record || '–' }}</td>
                         </tr>

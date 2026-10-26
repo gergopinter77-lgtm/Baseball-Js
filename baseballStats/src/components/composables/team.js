@@ -90,7 +90,7 @@ export const TEAM_STATS = [
     },
 ]
 
-const POSTSEASON_NAMES = { F: 'Wild Card', D: 'Division Series', L: 'LCS', W: 'World Series' }
+export const POSTSEASON_NAMES = { F: 'Wild Card', D: 'Division Series', L: 'LCS', W: 'World Series' }
 
 // One player's season stats for a group, preferring the split with this team (traded players have several)
 function rosterStats(person, group, teamId) {

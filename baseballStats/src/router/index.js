@@ -27,6 +27,16 @@ const router = createRouter({
       component: () => import('../views/StandingsView.vue'),
     },
     {
+      path: '/matches',
+      name: 'matches',
+      component: () => import('../views/MatchesView.vue'),
+    },
+    {
+      path: '/match/:id',
+      name: 'match',
+      component: () => import('../views/MatchView.vue'),
+    },
+    {
       path: '/player/:id',
       name: 'player',
       component: () => import('../views/PlayerView.vue'),
@@ -66,7 +76,7 @@ router.beforeEach(async (to) => {
   if (!to.meta.requiresAuth && !to.meta.requiresAdmin) return true
   const { user, isAdmin, ready } = useAuth()
   await ready
-  if (!user.value) return { name: 'login' }
+  if (!user.value) return { name: 'login', query: { redirect: to.fullPath } }
   if (to.meta.requiresAdmin && !isAdmin.value) return { name: 'home' }
   return true
 })

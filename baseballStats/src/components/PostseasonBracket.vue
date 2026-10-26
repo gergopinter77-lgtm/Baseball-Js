@@ -85,9 +85,13 @@
                             v-for="g in selected.games"
                             :key="g.gamePk"
                             class="border-t border-white/5"
-                            :class="!isPlayed(g) && 'text-primary-light'"
+                            :class="[!isPlayed(g) && 'text-primary-light', hasTeams(g) && 'cursor-pointer hover:bg-white/3']"
+                            @click="hasTeams(g) && router.push(matchLink(g))"
                         >
-                            <td class="td">{{ g.seriesGameNumber }}</td>
+                            <td class="td">
+                                <RouterLink v-if="hasTeams(g)" :to="matchLink(g)" class="hover:text-secondary">{{ g.seriesGameNumber }}</RouterLink>
+                                <template v-else>{{ g.seriesGameNumber }}</template>
+                            </td>
                             <td class="td">{{ formatDate(g.gameDate) }}</td>
                             <td class="td" :class="g.teams.away.isWinner && 'font-bold'">
                                 <span class="flex items-center gap-2">
@@ -105,6 +109,7 @@
                             <td class="td text-center" :class="g.teams.home.isWinner && 'font-bold'">{{ g.teams.home.score ?? '–' }}</td>
                             <td class="td text-right">
                                 {{ g.status.detailedState }}<span v-if="g.ifNecessary === 'Y' && !isPlayed(g)" class="text-xs"> (if needed)</span>
+                                <span v-if="hasTeams(g)" class="text-secondary ml-1.5">→</span>
                             </td>
                         </tr>
                     </tbody>
@@ -116,6 +121,7 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { getPostseason, teamLogoUrl } from '@/api/mlb'
 import { CURRENT_SEASON } from './composables/player'
 import { BRACKET_COLUMNS, FIRST_BRACKET_SEASON, summarizeSeries, abbr, formatDate } from './composables/postseason'
@@ -124,6 +130,12 @@ const seasons = Array.from(
     { length: CURRENT_SEASON - FIRST_BRACKET_SEASON + 1 },
     (_, i) => CURRENT_SEASON - i,
 )
+
+const router = useRouter()
+
+// A game opens its match page once both teams are known (not "TBD")
+const hasTeams = (g) => !!(g.teams.away.team?.id && g.teams.home.team?.id)
+const matchLink = (g) => ({ name: 'match', params: { id: g.gamePk } })
 
 const season = ref(CURRENT_SEASON)
 const seriesById = ref(new Map())

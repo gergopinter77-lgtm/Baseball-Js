@@ -10,17 +10,18 @@ const links = [
   { to: '/', label: 'Home' },
   { to: '/compare', label: 'Compare' },
   { to: '/standings', label: 'Standings' },
+  { to: '/matches', label: 'Matches' },
 ]
 </script>
 
 <template>
   <header class="sticky top-0 z-30 bg-primary-gradient/90 backdrop-blur border-b border-white/5">
-    <nav class="max-w-7xl mx-auto px-4 md:px-8 h-16 flex items-center gap-6">
+    <nav class="max-w-7xl mx-auto px-4 md:px-8 h-16 flex items-center gap-3 md:gap-6">
       <RouterLink to="/" class="flex items-center gap-2 shrink-0">
         <Atbat class="w-10 h-10" />
       </RouterLink>
 
-      <div class="flex-1 flex items-center gap-1 text-sm font-medium">
+      <div class="flex-1 min-w-0 flex items-center gap-1 text-sm font-medium overflow-x-auto whitespace-nowrap [scrollbar-width:none]">
         <RouterLink
           v-for="link in links"
           :key="link.to"
@@ -41,7 +42,7 @@ const links = [
       </div>
 
       <UserMenu v-if="user" />
-      <RouterLink v-else to="/login" class="btn-primary h-9! px-4! text-sm">Log in</RouterLink>
+      <RouterLink v-else to="/login" class="btn-primary h-9! px-4! text-sm shrink-0">Log in</RouterLink>
     </nav>
   </header>
 

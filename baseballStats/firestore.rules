@@ -19,5 +19,19 @@ service cloud.firestore {
       // Only admins can delete accounts
       allow delete: if isAdmin();
     }
+
+    // "Who will win?" polls: one vote per account per match, saved under the voter's uid
+    match /polls/{gamePk}/votes/{uid} {
+      // You can always check your own vote (to see if you voted yet)
+      allow get: if request.auth != null && request.auth.uid == uid;
+      // Results (all votes) only once you have voted yourself
+      allow list: if request.auth != null &&
+        exists(/databases/$(database)/documents/polls/$(gamePk)/votes/$(request.auth.uid));
+      // Vote once, for yourself, with only a team id and the server time. No changing it afterwards.
+      allow create: if request.auth != null && request.auth.uid == uid
+                    && request.resource.data.keys().hasOnly(['teamId', 'createdAt'])
+                    && request.resource.data.teamId is int
+                    && request.resource.data.createdAt == request.time;
+    }
   }
 }

@@ -83,6 +83,13 @@ async function changePassword(currentPassword, newPassword) {
     await updatePassword(user.value, newPassword)
 }
 
+// Where to go after logging in: back to the page that sent you here (?redirect=/match/123), or home.
+// Only paths inside this site, so a link can't send you to another website.
+export function redirectPath(query) {
+    const path = query.redirect
+    return typeof path === 'string' && path.startsWith('/') && !path.startsWith('//') ? path : '/'
+}
+
 // Turns Firebase error codes into something readable
 export function friendlyError(err) {
     const messages = {
