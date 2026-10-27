@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { collection, getDocs, doc, updateDoc, deleteDoc } from 'firebase/firestore'
+import { savePublicProfile, deletePublicProfile } from '@/components/composables/publicProfiles'
 import { db } from '@/firebase'
 import UserAvatar from '@/components/UserAvatar.vue'
 import { useAuth, friendlyError } from '@/components/composables/useAuth'
@@ -65,6 +66,8 @@ async function saveEdit() {
     await updateDoc(doc(db, 'users', id), { displayName: displayName.trim(), role })
     const target = accounts.value.find((a) => a.id === id)
     Object.assign(target, { displayName: displayName.trim(), role })
+    // The new name shows up in friend search too (if that fails, the next admin visit fixes it)
+    savePublicProfile(id, target).catch(() => {})
     editing.value = null
   } catch (err) {
     error.value = friendlyError(err)
@@ -78,6 +81,8 @@ async function confirmDelete() {
   error.value = ''
   try {
     await deleteDoc(doc(db, 'users', deleting.value.id))
+    // Take them out of friend search as well (if that fails, the next admin visit cleans it up)
+    deletePublicProfile(deleting.value.id).catch(() => {})
     accounts.value = accounts.value.filter((a) => a.id !== deleting.value.id)
     deleting.value = null
   } catch (err) {

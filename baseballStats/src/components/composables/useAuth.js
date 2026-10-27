@@ -10,6 +10,7 @@ import {
 } from 'firebase/auth'
 import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore'
 import { auth, db } from '@/firebase'
+import { savePublicProfile, syncAllPublicProfiles } from './publicProfiles'
 
 // Created once, outside the function, so every component shares the same user
 const user = ref(null)
@@ -30,9 +31,21 @@ onAuthStateChanged(auth, async (firebaseUser) => {
         profile.value = await loadProfile(firebaseUser.uid)
         // An admin removed this account, so don't let it stay logged in
         if (!profile.value) await signOut(auth)
+        else {
+            // Also makes the public profile for accounts made before friends existed
+            syncPublicProfile(firebaseUser.uid, profile.value)
+            // Admins fill in everyone else's, so all accounts can be found in friend search
+            if (profile.value.role === 'admin') syncAllPublicProfiles().catch(() => {})
+        }
     }
     markReady()
 })
+
+// Copies name and picture to the public profile others can search.
+// Runs in the background: if it fails, logging in and saving still work.
+function syncPublicProfile(uid, p) {
+    savePublicProfile(uid, p).catch(() => {})
+}
 
 async function loadProfile(uid) {
     const snap = await getDoc(doc(db, 'users', uid))
@@ -61,6 +74,7 @@ async function register(email, password, displayName) {
         }
         await setDoc(doc(db, 'users', result.user.uid), data)
         profile.value = { id: result.user.uid, ...data }
+        syncPublicProfile(result.user.uid, data)
     } finally {
         registering = false
     }
@@ -74,6 +88,7 @@ async function logout() {
 async function updateMyProfile(fields) {
     await updateDoc(doc(db, 'users', user.value.uid), fields)
     profile.value = { ...profile.value, ...fields }
+    syncPublicProfile(user.value.uid, profile.value)
 }
 
 // Firebase wants the current password again before it lets you set a new one

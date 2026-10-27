@@ -150,6 +150,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { playerPhotoUrl, teamLogoUrl } from '@/api/mlb'
 import { useAuth } from '@/components/composables/useAuth'
 import { useFantasy } from '@/components/composables/useFantasy'
+import { useFriends } from '@/components/composables/useFriends'
 import { BUDGET, STATS_SEASON, FANTASY_SEASON, SCORING, POSITION_FILTERS, SLOTS, statLine } from '@/components/composables/fantasy'
 import FantasyTeam from '@/components/FantasyTeam.vue'
 import FantasyLeaderboard from '@/components/FantasyLeaderboard.vue'
@@ -157,7 +158,8 @@ import FantasyLeaderboard from '@/components/FantasyLeaderboard.vue'
 const route = useRoute()
 const router = useRouter()
 const { user, profile } = useAuth()
-const { market, team, spent, left, points, isFull, loading, error, saveState, cantAddReason, add, remove, clear } = useFantasy()
+const { market, team, spent, left, points, isFull, loading, error, saveState, cantAddReason, add, remove, clear, summarize, loadPicksOf } = useFantasy()
+const { friends } = useFriends()
 
 const search = ref('')
 const position = ref('All')
@@ -188,8 +190,23 @@ const shown = computed(() => filtered.value.slice(0, limit.value))
 // A new search or filter starts at the top of the list again
 watch([search, position, sort, affordableOnly], () => (limit.value = PAGE_SIZE))
 
-// You plus your friends' teams. Friends aren't built yet, so for now it's only you.
-const friendEntries = ref([])
+// Your friends' saved picks: uid -> picks. Loaded again when your friends list changes.
+const friendPicks = ref({})
+watch(() => friends.value.map((f) => f.uid).join(','), async () => {
+    const list = friends.value
+    const picks = await Promise.all(list.map((f) => loadPicksOf(f.uid)))
+    friendPicks.value = Object.fromEntries(list.map((f, i) => [f.uid, picks[i]]))
+}, { immediate: true })
+
+const friendEntries = computed(() => friends.value.map((f) => ({
+    uid: f.uid,
+    name: f.displayName,
+    photo: f.photoURL,
+    ...summarize(friendPicks.value[f.uid]),
+    isMe: false,
+})))
+
+// You plus your friends' teams
 const leaderboard = computed(() => {
     if (!user.value) return []
     const me = {

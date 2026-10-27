@@ -6,6 +6,61 @@ service cloud.firestore {
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
 
+    // Friendship documents are named "smallerUid_biggerUid"
+    function friendshipPath(a, b) {
+      return /databases/$(database)/documents/friendships/$(a < b ? a + '_' + b : b + '_' + a);
+    }
+
+    function isFriendOf(uid) {
+      return request.auth != null && exists(friendshipPath(request.auth.uid, uid))
+        && get(friendshipPath(request.auth.uid, uid)).data.status == 'accepted';
+    }
+
+    // Name, picture, bio and favourites only (no email), so any logged in user can find and view others
+    match /publicProfiles/{uid} {
+      allow read: if request.auth != null;
+      allow create, update: if request.auth != null && (request.auth.uid == uid || isAdmin())
+                    && request.resource.data.keys().hasOnly(['displayName', 'nameLower', 'photoURL', 'bio',
+                         'favouritePlayers', 'favouriteTeams'])
+                    && request.resource.data.displayName is string
+                    && request.resource.data.displayName.size() <= 100
+                    && request.resource.data.nameLower is string
+                    && (!('bio' in request.resource.data) || (request.resource.data.bio is string
+                         && request.resource.data.bio.size() <= 500))
+                    && (!('favouritePlayers' in request.resource.data) || (request.resource.data.favouritePlayers is list
+                         && request.resource.data.favouritePlayers.size() <= 100))
+                    && (!('favouriteTeams' in request.resource.data) || (request.resource.data.favouriteTeams is list
+                         && request.resource.data.favouriteTeams.size() <= 100));
+      allow delete: if request.auth != null && (request.auth.uid == uid || isAdmin());
+    }
+
+    // One document per pair of users: a pending request, or friends once accepted
+    match /friendships/{id} {
+      // Only the two people in it can see it
+      allow read: if request.auth != null && request.auth.uid in resource.data.users;
+      // Send a request: from yourself, to someone else, as pending, under the right document name
+      allow create: if request.auth != null
+                    && request.resource.data.keys().hasOnly(['users', 'requester', 'status', 'createdAt'])
+                    && request.resource.data.users is list
+                    && request.resource.data.users.size() == 2
+                    && request.resource.data.users[0] < request.resource.data.users[1]
+                    && id == request.resource.data.users[0] + '_' + request.resource.data.users[1]
+                    && request.resource.data.requester == request.auth.uid
+                    && request.auth.uid in request.resource.data.users
+                    && request.resource.data.status == 'pending'
+                    && request.resource.data.createdAt == request.time;
+      // Accept: only the person who got the request, and only from pending to accepted
+      allow update: if request.auth != null
+                    && request.auth.uid in resource.data.users
+                    && request.auth.uid != resource.data.requester
+                    && resource.data.status == 'pending'
+                    && request.resource.data.status == 'accepted'
+                    && request.resource.data.acceptedAt == request.time
+                    && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'acceptedAt']);
+      // Decline, cancel or unfriend: either of the two
+      allow delete: if request.auth != null && request.auth.uid in resource.data.users;
+    }
+
     match /users/{uid} {
       // You can read your own profile; admins can read everyone
       allow read: if request.auth != null && (request.auth.uid == uid || isAdmin());
@@ -34,9 +89,10 @@ service cloud.firestore {
                     && request.resource.data.createdAt == request.time;
     }
 
-    // Fantasy teams: one per account per season, only you can see or change yours
+    // Fantasy teams: one per account per season. You and your friends can see it, only you can change it.
     match /fantasy/{season}/teams/{uid} {
-      allow read, delete: if request.auth != null && request.auth.uid == uid;
+      allow read: if request.auth != null && (request.auth.uid == uid || isFriendOf(uid));
+      allow delete: if request.auth != null && request.auth.uid == uid;
       allow create, update: if request.auth != null && request.auth.uid == uid
                     && request.resource.data.keys().hasOnly(['picks', 'updatedAt'])
                     && request.resource.data.picks is map

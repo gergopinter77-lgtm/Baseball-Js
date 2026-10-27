@@ -34,11 +34,11 @@
                             {{ i + 1 }}
                         </td>
                         <td class="td">
-                            <span class="flex items-center gap-2.5">
+                            <RouterLink :to="{ name: 'user', params: { id: e.uid } }" class="flex items-center gap-2.5 group">
                                 <UserAvatar :photo="e.photo" :name="e.name" class="w-8 h-8 text-sm" />
-                                <span class="font-medium">{{ e.name }}</span>
+                                <span class="font-medium group-hover:text-secondary">{{ e.name }}</span>
                                 <span v-if="e.isMe" class="text-xs text-secondary">You</span>
-                            </span>
+                            </RouterLink>
                         </td>
                         <td class="td text-right text-primary-light">{{ e.players }}/{{ slotCount }}</td>
                         <td class="td text-right text-primary-light">${{ e.spent }}M</td>

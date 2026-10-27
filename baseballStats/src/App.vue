@@ -4,8 +4,11 @@ import { RouterLink, RouterView, useRouter } from 'vue-router'
 import Atbat from '@/components/icons/atbat.svg?component'
 import UserMenu from '@/components/UserMenu.vue'
 import { useAuth } from '@/components/composables/useAuth'
+import { useFriends } from '@/components/composables/useFriends'
 
 const { user, isAdmin } = useAuth()
+// Friend requests waiting for an answer, shown as a number on the Friends button
+const { incoming } = useFriends()
 
 // True while a page is opening, so a slow first click shows the loading bar instead of looking stuck
 // (only after a short wait, so pages that open right away don't flash it)
@@ -62,7 +65,7 @@ const links = [
       <template v-if="user">
         <RouterLink
           to="/friends"
-          class="shrink-0 flex items-center gap-2 h-9 px-3 rounded-md text-sm font-medium text-text-nav hover:text-white hover:bg-white/5 transition-colors"
+          class="relative shrink-0 flex items-center gap-2 h-9 px-3 rounded-md text-sm font-medium text-text-nav hover:text-white hover:bg-white/5 transition-colors"
           exact-active-class="text-white! bg-white/8"
           title="Friends"
         >
@@ -74,6 +77,13 @@ const links = [
             <path d="M18.5 14.2a6.5 6.5 0 0 1 3 5.8" />
           </svg>
           <span class="hidden sm:inline">Friends</span>
+          <span
+            v-if="incoming.length"
+            class="absolute -top-1 -right-1 min-w-5 h-5 px-1 rounded-full bg-secondary-dark text-white text-[11px] font-bold flex items-center justify-center"
+            :aria-label="`${incoming.length} friend requests`"
+          >
+            {{ incoming.length }}
+          </span>
         </RouterLink>
         <UserMenu />
       </template>

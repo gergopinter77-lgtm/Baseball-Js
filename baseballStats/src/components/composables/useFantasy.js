@@ -8,6 +8,50 @@ import { BUDGET, SLOTS, STATS_SEASON, FANTASY_SEASON, buildMarket, openSlotFor }
 // Wait this long after the last change before saving, so quick clicks become one save
 const SAVE_DELAY = 600
 
+const teamDoc = (uid) => doc(db, 'fantasy', String(FANTASY_SEASON), 'teams', uid)
+
+// Every player with a price. Downloaded once and shared, so the fantasy page and profiles don't fetch it twice.
+let marketPromise = null
+export function loadMarket() {
+    marketPromise ??= Promise.all([
+        getSeasonStats('hitting', STATS_SEASON),
+        getSeasonStats('pitching', STATS_SEASON),
+        getTeams(),
+    ])
+        .then(([hitting, pitching, teams]) => buildMarket(hitting, pitching, teams))
+        // Try again next time instead of keeping the failure
+        .catch((e) => {
+            marketPromise = null
+            throw e
+        })
+    return marketPromise
+}
+
+// Someone's saved picks (yours or a friend's), or {} when there is no team or you may not see it
+export async function loadPicksOf(uid) {
+    try {
+        const snap = await getDoc(teamDoc(uid))
+        return snap.exists() ? (snap.data().picks ?? {}) : {}
+    } catch {
+        return {}
+    }
+}
+
+// Picks -> every spot in order with its player (or null), using the market's players by key
+export function teamFromPicks(picks, byKey) {
+    return SLOTS.map((slot) => ({ ...slot, player: byKey[picks?.[slot.id]] ?? null }))
+}
+
+// Totals for a team in slot order: players picked, money spent and points
+export function teamTotals(team) {
+    const players = team.filter((s) => s.player).map((s) => s.player)
+    return {
+        players: players.length,
+        spent: players.reduce((sum, p) => sum + p.cost, 0),
+        points: players.reduce((sum, p) => sum + p.points, 0),
+    }
+}
+
 // Loads the player market and the logged in user's fantasy team.
 // Teams are saved as fantasy/{season}/teams/{uid} = { picks: { C: 'h-123', SP1: 'p-456', ... } }
 export function useFantasy() {
@@ -22,25 +66,21 @@ export function useFantasy() {
     const byKey = computed(() => Object.fromEntries(market.value.map((p) => [p.key, p])))
 
     // The team in slot order; empty slots have player: null
-    const team = computed(() => SLOTS.map((slot) => ({ ...slot, player: byKey.value[picks.value[slot.id]] ?? null })))
-    const spent = computed(() => team.value.reduce((sum, s) => sum + (s.player?.cost ?? 0), 0))
+    const team = computed(() => teamFromPicks(picks.value, byKey.value))
+    const spent = computed(() => teamTotals(team.value).spent)
     const left = computed(() => BUDGET - spent.value)
-    const points = computed(() => team.value.reduce((sum, s) => sum + (s.player?.points ?? 0), 0))
+    const points = computed(() => teamTotals(team.value).points)
     const isFull = computed(() => team.value.every((s) => s.player))
     const pickedKeys = computed(() => new Set(Object.values(picks.value)))
 
-    const teamDoc = () => doc(db, 'fantasy', String(FANTASY_SEASON), 'teams', user.value.uid)
+    // Totals for any team's picks (yours or a friend's)
+    const summarize = (teamPicks) => teamTotals(teamFromPicks(teamPicks, byKey.value))
 
-    async function loadMarket() {
+    async function fetchMarket() {
         loading.value = true
         error.value = ''
         try {
-            const [hitting, pitching, teams] = await Promise.all([
-                getSeasonStats('hitting', STATS_SEASON),
-                getSeasonStats('pitching', STATS_SEASON),
-                getTeams(),
-            ])
-            market.value = buildMarket(hitting, pitching, teams)
+            market.value = await loadMarket()
         } catch (e) {
             error.value = `Could not load players (${e.message})`
         } finally {
@@ -58,7 +98,7 @@ export function useFantasy() {
         await ready
         if (!user.value) return
         try {
-            const snap = await getDoc(teamDoc())
+            const snap = await getDoc(teamDoc(user.value.uid))
             const saved = snap.exists() ? (snap.data().picks ?? {}) : {}
             savedJson = JSON.stringify(saved)
             picks.value = saved
@@ -94,7 +134,7 @@ export function useFantasy() {
     async function save() {
         const json = JSON.stringify(picks.value)
         try {
-            await setDoc(teamDoc(), { picks: picks.value, updatedAt: serverTimestamp() })
+            await setDoc(teamDoc(user.value.uid), { picks: picks.value, updatedAt: serverTimestamp() })
             savedJson = json
             saveState.value = 'saved'
         } catch {
@@ -115,9 +155,9 @@ export function useFantasy() {
         saveTimer = setTimeout(save, SAVE_DELAY)
     })
 
-    loadMarket()
+    fetchMarket()
     // Load the team again when someone logs in or out
     watch(() => user.value?.uid, loadTeam, { immediate: true })
 
-    return { market, team, spent, left, points, isFull, loading, error, saveState, cantAddReason, add, remove, clear }
+    return { market, team, spent, left, points, isFull, loading, error, saveState, cantAddReason, add, remove, clear, summarize, loadPicksOf }
 }
