@@ -37,6 +37,11 @@ const router = createRouter({
       component: () => import('../views/MatchView.vue'),
     },
     {
+      path: '/fantasy',
+      name: 'fantasy',
+      component: () => import('../views/FantasyView.vue'),
+    },
+    {
       path: '/player/:id',
       name: 'player',
       component: () => import('../views/PlayerView.vue'),

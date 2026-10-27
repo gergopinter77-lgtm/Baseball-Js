@@ -11,6 +11,7 @@ const links = [
   { to: '/compare', label: 'Compare' },
   { to: '/standings', label: 'Standings' },
   { to: '/matches', label: 'Matches' },
+  { to: '/fantasy', label: 'Fantasy' },
 ]
 </script>
 

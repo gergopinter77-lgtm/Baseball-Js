@@ -20,5 +20,6 @@ const options = [
     { to: '/compare', title: 'Compare', text: 'Two players side by side' },
     { to: '/standings', title: 'Standings', text: 'Divisions and the postseason' },
     { to: '/matches', title: 'Matches', text: "Today's games and who will win" },
+    { to: '/fantasy', title: 'Fantasy', text: 'Build a team for next season' },
 ]
 </script>

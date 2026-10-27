@@ -100,6 +100,21 @@ export function getPlayerSeason(id, season) {
   return get(`/people/${id}?hydrate=${hydrate}`)
 }
 
+// ---------- Fantasy page ----------
+
+// Only the fields the fantasy page uses, so the download stays small (all players at once)
+const SEASON_STATS_FIELDS = [
+  'stats', 'splits', 'stat', 'player', 'id', 'fullName', 'team', 'position', 'abbreviation',
+  'gamesPlayed', 'plateAppearances', 'hits', 'doubles', 'triples', 'homeRuns', 'runs', 'rbi',
+  'baseOnBalls', 'stolenBases', 'strikeOuts', 'avg', 'ops',
+  'gamesStarted', 'outs', 'inningsPitched', 'wins', 'saves', 'holds', 'earnedRuns', 'era', 'whip',
+].join(',')
+
+// Season totals of every player who played, for one group ('hitting' or 'pitching')
+export function getSeasonStats(group, season) {
+  return get(`/stats?stats=season&group=${group}&season=${season}&sportId=1&playerPool=ALL&limit=3000&fields=${SEASON_STATS_FIELDS}`)
+}
+
 // ---------- Match page ----------
 
 // One game with both teams, their records and the probable starting pitchers

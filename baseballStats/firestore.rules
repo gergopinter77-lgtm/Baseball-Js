@@ -33,5 +33,15 @@ service cloud.firestore {
                     && request.resource.data.teamId is int
                     && request.resource.data.createdAt == request.time;
     }
+
+    // Fantasy teams: one per account per season, only you can see or change yours
+    match /fantasy/{season}/teams/{uid} {
+      allow read, delete: if request.auth != null && request.auth.uid == uid;
+      allow create, update: if request.auth != null && request.auth.uid == uid
+                    && request.resource.data.keys().hasOnly(['picks', 'updatedAt'])
+                    && request.resource.data.picks is map
+                    && request.resource.data.picks.size() <= 15
+                    && request.resource.data.updatedAt == request.time;
+    }
   }
 }
