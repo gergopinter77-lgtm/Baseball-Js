@@ -82,3 +82,9 @@
 @utility td {
   @apply py-2.5 px-3;
 }
+
+/* Loading bar in the header while a page opens */
+@keyframes nav-loading {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(300%); }
+}

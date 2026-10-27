@@ -78,7 +78,7 @@ defineEmits(['remove', 'clear'])
 
 const SAVE_LABELS = {
     saving: { text: 'Saving...', class: 'text-primary-light' },
-    saved: { text: '✓ Saved', class: 'text-emerald-400' },
+    saved: { text: 'Saved', class: 'text-emerald-400' },
     error: { text: 'Could not save', class: 'text-secondary' },
 }
 

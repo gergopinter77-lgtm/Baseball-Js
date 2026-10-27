@@ -1,10 +1,27 @@
 <script setup>
-import { RouterLink, RouterView } from 'vue-router'
+import { ref } from 'vue'
+import { RouterLink, RouterView, useRouter } from 'vue-router'
 import Atbat from '@/components/icons/atbat.svg?component'
 import UserMenu from '@/components/UserMenu.vue'
 import { useAuth } from '@/components/composables/useAuth'
 
 const { user, isAdmin } = useAuth()
+
+// True while a page is opening, so a slow first click shows the loading bar instead of looking stuck
+// (only after a short wait, so pages that open right away don't flash it)
+const router = useRouter()
+const navigating = ref(false)
+let showTimer = null
+function stopLoading() {
+  clearTimeout(showTimer)
+  navigating.value = false
+}
+router.beforeEach(() => {
+  clearTimeout(showTimer)
+  showTimer = setTimeout(() => (navigating.value = true), 150)
+})
+router.afterEach(stopLoading)
+router.onError(stopLoading)
 
 const links = [
   { to: '/', label: 'Home' },
@@ -45,6 +62,11 @@ const links = [
       <UserMenu v-if="user" />
       <RouterLink v-else to="/login" class="btn-primary h-9! px-4! text-sm shrink-0">Log in</RouterLink>
     </nav>
+
+    <!-- Loading bar along the bottom of the header -->
+    <div v-if="navigating" class="absolute inset-x-0 -bottom-px h-0.5 overflow-hidden" role="progressbar" aria-label="Loading page">
+      <div class="h-full w-1/3 bg-secondary-dark animate-[nav-loading_1s_ease-in-out_infinite]" />
+    </div>
   </header>
 
   <div class="min-h-[calc(100vh-4rem)] bg-linear-to-b from-primary/60 to-primary-gradient">
