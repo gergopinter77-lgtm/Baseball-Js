@@ -62,8 +62,8 @@ export function useFantasy() {
             const saved = snap.exists() ? (snap.data().picks ?? {}) : {}
             savedJson = JSON.stringify(saved)
             picks.value = saved
-        } catch (e) {
-            error.value = `Could not load your team (${e.message})`
+        } catch {
+            // No saved team we can read: start with an empty one
         }
     }
 
