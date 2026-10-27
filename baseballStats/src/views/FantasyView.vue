@@ -38,6 +38,14 @@
 
         <p v-if="error" class="alert-error mb-6">{{ error }}</p>
 
+        <FantasyLeaderboard
+            :entries="leaderboard"
+            :slot-count="SLOTS.length"
+            :stats-season="STATS_SEASON"
+            :fantasy-season="FANTASY_SEASON"
+            class="mb-6"
+        />
+
         <div class="grid grid-cols-1 lg:grid-cols-[1fr_22rem] gap-6 items-start">
             <!-- Player market -->
             <section class="card p-5 min-w-0">
@@ -142,12 +150,13 @@ import { useRoute, useRouter } from 'vue-router'
 import { playerPhotoUrl, teamLogoUrl } from '@/api/mlb'
 import { useAuth } from '@/components/composables/useAuth'
 import { useFantasy } from '@/components/composables/useFantasy'
-import { BUDGET, STATS_SEASON, FANTASY_SEASON, SCORING, POSITION_FILTERS, statLine } from '@/components/composables/fantasy'
+import { BUDGET, STATS_SEASON, FANTASY_SEASON, SCORING, POSITION_FILTERS, SLOTS, statLine } from '@/components/composables/fantasy'
 import FantasyTeam from '@/components/FantasyTeam.vue'
+import FantasyLeaderboard from '@/components/FantasyLeaderboard.vue'
 
 const route = useRoute()
 const router = useRouter()
-const { user } = useAuth()
+const { user, profile } = useAuth()
 const { market, team, spent, left, points, isFull, loading, error, saveState, cantAddReason, add, remove, clear } = useFantasy()
 
 const search = ref('')
@@ -178,6 +187,22 @@ const shown = computed(() => filtered.value.slice(0, limit.value))
 
 // A new search or filter starts at the top of the list again
 watch([search, position, sort, affordableOnly], () => (limit.value = PAGE_SIZE))
+
+// You plus your friends' teams. Friends aren't built yet, so for now it's only you.
+const friendEntries = ref([])
+const leaderboard = computed(() => {
+    if (!user.value) return []
+    const me = {
+        uid: user.value.uid,
+        name: profile.value?.displayName || user.value.email,
+        photo: profile.value?.photoURL ?? '',
+        players: team.value.filter((s) => s.player).length,
+        spent: spent.value,
+        points: points.value,
+        isMe: true,
+    }
+    return [me, ...friendEntries.value]
+})
 
 const loginLink = computed(() => ({ name: 'login', query: { redirect: route.fullPath } }))
 

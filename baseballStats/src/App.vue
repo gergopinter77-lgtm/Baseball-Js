@@ -59,7 +59,24 @@ const links = [
         </RouterLink>
       </div>
 
-      <UserMenu v-if="user" />
+      <template v-if="user">
+        <RouterLink
+          to="/friends"
+          class="shrink-0 flex items-center gap-2 h-9 px-3 rounded-md text-sm font-medium text-text-nav hover:text-white hover:bg-white/5 transition-colors"
+          exact-active-class="text-white! bg-white/8"
+          title="Friends"
+        >
+          <!-- Two people icon -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5" aria-hidden="true">
+            <circle cx="9" cy="8" r="3.5" />
+            <path d="M2.5 20a6.5 6.5 0 0 1 13 0" />
+            <path d="M16 4.6a3.5 3.5 0 0 1 0 6.8" />
+            <path d="M18.5 14.2a6.5 6.5 0 0 1 3 5.8" />
+          </svg>
+          <span class="hidden sm:inline">Friends</span>
+        </RouterLink>
+        <UserMenu />
+      </template>
       <RouterLink v-else to="/login" class="btn-primary h-9! px-4! text-sm shrink-0">Log in</RouterLink>
     </nav>
 
