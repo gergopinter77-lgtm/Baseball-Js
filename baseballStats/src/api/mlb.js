@@ -126,3 +126,8 @@ export function getMatch(gamePk) {
 export function getHeadToHead(teamId, opponentId, season) {
   return get(`/schedule?sportId=1&teamId=${teamId}&opponentId=${opponentId}&season=${season}&gameType=R,F,D,L,W&hydrate=team`)
 }
+
+// Who played in a game and how they did (batting and pitching lines per player)
+export function getBoxscore(gamePk) {
+  return get(`/game/${gamePk}/boxscore`)
+}

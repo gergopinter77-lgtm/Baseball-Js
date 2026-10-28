@@ -16,6 +16,34 @@ service cloud.firestore {
         && get(friendshipPath(request.auth.uid, uid)).data.status == 'accepted';
     }
 
+    // A comment's player rating: who, from which team, and 1-5 whole stars
+    function isValidRating(r) {
+      return r is map
+        && r.keys().hasOnly(['playerId', 'playerName', 'teamId', 'stars'])
+        && r.playerId is int
+        && r.playerName is string && r.playerName.size() <= 100
+        && r.teamId is int
+        && r.stars is int && r.stars >= 1 && r.stars <= 5;
+    }
+
+    // Match discussions: logged in users read and write, as themselves, in plain text
+    match /matches/{gamePk}/comments/{commentId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null
+                    && request.resource.data.keys().hasOnly(['uid', 'text', 'createdAt', 'rating'])
+                    && request.resource.data.uid == request.auth.uid
+                    && request.resource.data.createdAt == request.time
+                    && request.resource.data.text is string
+                    && request.resource.data.text.size() <= 500
+                    // No HTML tags, even if someone skips the app's own cleaning
+                    && !request.resource.data.text.matches('(?s).*<[a-zA-Z/!][^>]*>.*')
+                    // Text, a rating, or both
+                    && (request.resource.data.text.size() > 0 || 'rating' in request.resource.data)
+                    && (!('rating' in request.resource.data) || isValidRating(request.resource.data.rating));
+      // Comments can't be edited; the writer or an admin can delete them
+      allow delete: if request.auth != null && (resource.data.uid == request.auth.uid || isAdmin());
+    }
+
     // Name, picture, bio and favourites only (no email), so any logged in user can find and view others
     match /publicProfiles/{uid} {
       allow read: if request.auth != null;

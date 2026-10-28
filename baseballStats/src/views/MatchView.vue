@@ -71,7 +71,8 @@
                 <div class="flex flex-col gap-8 mt-8">
                     <WhoWillWinPoll :match="match" />
 
-                    <MatchDiscussion :match="match" />
+                    <!-- Only finished matches have a discussion -->
+                    <MatchDiscussion v-if="match.state === 'Final'" :match="match" />
 
                     <HeadToHead :history="history" :teams="[match.away.team, match.home.team]" :seasons="H2H_SEASONS" />
 

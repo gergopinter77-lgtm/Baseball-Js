@@ -96,3 +96,37 @@ export function formatDay(dateString) {
 export function formatTime(iso) {
     return new Date(iso).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })
 }
+
+// Boxscore -> everyone who got into the game, per team: { away: [...], home: [...] }
+// Each player: { id, name, position, teamId, summary } where summary is e.g. "2-4 | HR, 2 RBI"
+export function playersWhoPlayed(boxscore) {
+    const result = {}
+    for (const side of ['away', 'home']) {
+        const t = boxscore?.teams?.[side]
+        const ids = [...new Set([...(t?.batters ?? []), ...(t?.pitchers ?? [])])]
+        result[side] = ids
+            .map((id) => t.players[`ID${id}`])
+            .filter(Boolean)
+            .map((p) => {
+                const isPitcher = (t.pitchers ?? []).includes(p.person.id)
+                return {
+                    id: p.person.id,
+                    name: p.person.fullName,
+                    position: p.position?.abbreviation ?? '',
+                    teamId: t.team.id,
+                    summary: (isPitcher ? p.stats?.pitching?.summary : p.stats?.batting?.summary) ?? '',
+                }
+            })
+    }
+    return result
+}
+
+// "just now", "5 min ago", "3 h ago", or the date for older times
+export function timeAgo(date) {
+    if (!date) return 'just now'
+    const minutes = Math.round((Date.now() - date.getTime()) / 60000)
+    if (minutes < 1) return 'just now'
+    if (minutes < 60) return `${minutes} min ago`
+    if (minutes < 24 * 60) return `${Math.round(minutes / 60)} h ago`
+    return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })
+}
