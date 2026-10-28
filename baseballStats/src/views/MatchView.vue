@@ -71,6 +71,8 @@
                 <div class="flex flex-col gap-8 mt-8">
                     <WhoWillWinPoll :match="match" />
 
+                    <MatchDiscussion :match="match" />
+
                     <HeadToHead :history="history" :teams="[match.away.team, match.home.team]" :seasons="H2H_SEASONS" />
 
                     <section>
@@ -92,6 +94,7 @@ import { teamLogoUrl, playerPhotoUrl } from '@/api/mlb'
 import { useMatch, H2H_SEASONS } from '@/components/composables/useMatch'
 import { formatDate, formatTime } from '@/components/composables/match'
 import WhoWillWinPoll from '@/components/WhoWillWinPoll.vue'
+import MatchDiscussion from '@/components/MatchDiscussion.vue'
 import HeadToHead from '@/components/HeadToHead.vue'
 import MatchRoster from '@/components/MatchRoster.vue'
 
