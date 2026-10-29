@@ -44,7 +44,7 @@
                                         class="flex items-center gap-2 px-3 py-1.5"
                                         :class="[i === 0 && 'border-b border-white/10', t.isLoser && 'opacity-45']"
                                     >
-                                        <img v-if="t.team?.id" :src="teamLogoUrl(t.team.id)" alt="" class="w-5 h-5" />
+                                        <img loading="lazy" decoding="async" v-if="t.team?.id" :src="teamLogoUrl(t.team.id)" alt="" class="w-5 h-5" />
                                         <span v-else class="w-5 h-5 rounded-full bg-white/10"></span>
                                         <span class="flex-1 truncate" :class="t.isWinner ? 'font-bold' : 'font-medium'">{{ abbr(t.team) }}</span>
                                         <span class="font-display text-lg tabular-nums" :class="t.isWinner ? 'font-bold text-white' : 'text-primary-light'">
@@ -98,7 +98,7 @@
                             </td>
                             <td class="td" :class="g.teams.away.isWinner && 'font-bold'">
                                 <span class="flex items-center gap-2">
-                                    <img v-if="g.teams.away.team?.id" :src="teamLogoUrl(g.teams.away.team.id)" alt="" class="w-6 h-6" />
+                                    <img loading="lazy" decoding="async" v-if="g.teams.away.team?.id" :src="teamLogoUrl(g.teams.away.team.id)" alt="" class="w-6 h-6" />
                                     <span class="sm:hidden">{{ g.teams.away.team?.abbreviation ?? 'TBD' }}</span>
                                     <span class="hidden sm:inline">{{ g.teams.away.team?.teamName ?? 'TBD' }}</span>
                                 </span>
@@ -106,7 +106,7 @@
                             <td class="td text-center" :class="g.teams.away.isWinner && 'font-bold'">{{ g.teams.away.score ?? '–' }}</td>
                             <td class="td sm:pl-6!" :class="g.teams.home.isWinner && 'font-bold'">
                                 <span class="flex items-center gap-2">
-                                    <img v-if="g.teams.home.team?.id" :src="teamLogoUrl(g.teams.home.team.id)" alt="" class="w-6 h-6" />
+                                    <img loading="lazy" decoding="async" v-if="g.teams.home.team?.id" :src="teamLogoUrl(g.teams.home.team.id)" alt="" class="w-6 h-6" />
                                     <span class="sm:hidden">{{ g.teams.home.team?.abbreviation ?? 'TBD' }}</span>
                                     <span class="hidden sm:inline">{{ g.teams.home.team?.teamName ?? 'TBD' }}</span>
                                 </span>

@@ -38,7 +38,7 @@
 
                 <template v-if="slot.player">
                     <RouterLink :to="{ name: 'player', params: { id: slot.player.id } }" class="flex-1 min-w-0 flex items-center gap-2.5 group">
-                        <img :src="playerPhotoUrl(slot.player.id, 80)" alt="" class="w-7 aspect-[4/5] rounded object-cover bg-white/10" />
+                        <img loading="lazy" decoding="async" :src="playerPhotoUrl(slot.player.id, 80)" alt="" class="w-7 aspect-[4/5] rounded object-cover bg-white/10" />
                         <span class="truncate text-sm font-medium group-hover:text-secondary">{{ slot.player.name }}</span>
                     </RouterLink>
                     <span class="text-sm font-semibold">${{ slot.player.cost }}M</span>

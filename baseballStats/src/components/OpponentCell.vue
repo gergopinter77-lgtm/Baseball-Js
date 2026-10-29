@@ -2,7 +2,7 @@
     <!-- "vs [logo] Yankees  WORLD SERIES" -->
     <RouterLink :to="{ name: 'team', params: { id: game.opponent.id } }" class="flex items-center gap-2 group">
         <span class="text-primary-light w-5 text-xs">{{ game.isHome ? 'vs' : '@' }}</span>
-        <img :src="teamLogoUrl(game.opponent.id)" alt="" class="w-6 h-6" />
+        <img loading="lazy" decoding="async" :src="teamLogoUrl(game.opponent.id)" alt="" class="w-6 h-6" />
         <span class="group-hover:text-secondary">{{ game.opponent.teamName }}</span>
         <span
             v-if="game.round"

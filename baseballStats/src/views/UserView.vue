@@ -5,7 +5,7 @@
 
         <template v-else-if="person">
             <!-- Picture, name, bio and friend buttons -->
-            <section class="card p-4 sm:p-6 md:p-8 flex flex-col sm:flex-row sm:items-center gap-6">
+            <section v-reveal class="card p-4 sm:p-6 md:p-8 flex flex-col sm:flex-row sm:items-center gap-6">
                 <UserAvatar :photo="person.photoURL" :name="person.displayName" class="w-24 h-24 md:w-28 md:h-28 text-5xl" />
                 <div class="flex-1 min-w-0">
                     <h1 class="text-4xl md:text-5xl font-bold break-words">{{ person.displayName }}</h1>
@@ -21,14 +21,14 @@
 
             <!-- Favourite players and teams -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                <section class="card p-5 md:p-6">
+                <section v-reveal="1" class="card p-5 md:p-6">
                     <h2 class="text-2xl font-semibold mb-3">Favourite players</h2>
                     <p v-if="favouritesLoading" class="py-6 text-center text-primary-light">Loading...</p>
                     <p v-else-if="!favouritePlayers.length" class="py-6 text-center text-primary-light">No favourite players yet.</p>
                     <ul v-else>
                         <li v-for="p in favouritePlayers" :key="p.id" class="border-t border-white/5 first:border-t-0">
                             <RouterLink :to="{ name: 'player', params: { id: p.id } }" class="flex items-center gap-3 py-2 group">
-                                <img :src="playerPhotoUrl(p.id, 80)" alt="" class="w-8 aspect-[4/5] rounded-md object-cover bg-white/10" />
+                                <img loading="lazy" decoding="async" :src="playerPhotoUrl(p.id, 80)" alt="" class="w-8 aspect-[4/5] rounded-md object-cover bg-white/10" />
                                 <span class="flex-1 min-w-0">
                                     <span class="block truncate font-medium group-hover:text-secondary">{{ p.fullName }}</span>
                                     <span class="block text-xs text-primary-light">
@@ -40,14 +40,14 @@
                     </ul>
                 </section>
 
-                <section class="card p-5 md:p-6">
+                <section v-reveal="1" class="card p-5 md:p-6">
                     <h2 class="text-2xl font-semibold mb-3">Favourite teams</h2>
                     <p v-if="favouritesLoading" class="py-6 text-center text-primary-light">Loading...</p>
                     <p v-else-if="!favouriteTeams.length" class="py-6 text-center text-primary-light">No favourite teams yet.</p>
                     <ul v-else>
                         <li v-for="t in favouriteTeams" :key="t.id" class="border-t border-white/5 first:border-t-0">
                             <RouterLink :to="{ name: 'team', params: { id: t.id } }" class="flex items-center gap-3 py-2 group">
-                                <img :src="teamLogoUrl(t.id)" alt="" class="w-8 h-8" />
+                                <img loading="lazy" decoding="async" :src="teamLogoUrl(t.id)" alt="" class="w-8 h-8" />
                                 <span class="truncate font-medium group-hover:text-secondary">{{ t.name }}</span>
                             </RouterLink>
                         </li>
@@ -56,7 +56,7 @@
             </div>
 
             <!-- Fantasy team: only for you and your friends -->
-            <section class="card p-5 md:p-6 mt-6">
+            <section v-reveal="2" class="card p-5 md:p-6 mt-6">
                 <div class="flex flex-wrap items-baseline justify-between gap-2 mb-3">
                     <h2 class="text-2xl font-semibold">Fantasy {{ FANTASY_SEASON }} team</h2>
                     <div v-if="canSeeTeam && totals.players" class="flex gap-2 text-sm">
@@ -88,7 +88,7 @@
                         <span class="w-10 shrink-0 text-xs font-semibold text-primary-light">{{ slot.label }}</span>
                         <template v-if="slot.player">
                             <RouterLink :to="{ name: 'player', params: { id: slot.player.id } }" class="flex-1 min-w-0 flex items-center gap-2.5 group">
-                                <img :src="playerPhotoUrl(slot.player.id, 80)" alt="" class="w-7 aspect-[4/5] rounded object-cover bg-white/10" />
+                                <img loading="lazy" decoding="async" :src="playerPhotoUrl(slot.player.id, 80)" alt="" class="w-7 aspect-[4/5] rounded object-cover bg-white/10" />
                                 <span class="truncate text-sm font-medium group-hover:text-secondary">{{ slot.player.name }}</span>
                             </RouterLink>
                             <span class="text-sm font-semibold">${{ slot.player.cost }}M</span>

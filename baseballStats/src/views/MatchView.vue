@@ -69,20 +69,24 @@
                 </div>
 
                 <div class="flex flex-col gap-8 mt-8">
-                    <WhoWillWinPoll :match="match" />
+                    <WhoWillWinPoll v-reveal :match="match" />
 
-                    <!-- Only finished matches have a discussion -->
-                    <MatchDiscussion v-if="match.state === 'Final'" :match="match" />
+                    <!-- Only finished matches have a discussion; it loads when you scroll to it -->
+                    <LazyOnVisible v-if="match.state === 'Final'" min-height="320px">
+                        <MatchDiscussion v-reveal :match="match" />
+                    </LazyOnVisible>
 
-                    <HeadToHead :history="history" :teams="[match.away.team, match.home.team]" :seasons="H2H_SEASONS" />
+                    <HeadToHead v-reveal :history="history" :teams="[match.away.team, match.home.team]" :seasons="H2H_SEASONS" />
 
-                    <section>
-                        <h2 class="text-xl font-semibold mb-2">Players</h2>
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
-                            <MatchRoster :team="match.away.team" :groups="rosters.away" />
-                            <MatchRoster :team="match.home.team" :groups="rosters.home" />
-                        </div>
-                    </section>
+                    <LazyOnVisible min-height="600px">
+                        <section v-reveal>
+                            <h2 class="text-xl font-semibold mb-2">Players</h2>
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
+                                <MatchRoster :team="match.away.team" :groups="rosters.away" />
+                                <MatchRoster :team="match.home.team" :groups="rosters.home" />
+                            </div>
+                        </section>
+                    </LazyOnVisible>
                 </div>
             </template>
         </div>
@@ -90,14 +94,18 @@
 </template>
 
 <script setup>
+import { defineAsyncComponent } from 'vue'
 import { useRoute } from 'vue-router'
 import { teamLogoUrl, playerPhotoUrl } from '@/api/mlb'
 import { useMatch, H2H_SEASONS } from '@/components/composables/useMatch'
 import { formatDate, formatTime } from '@/components/composables/match'
 import WhoWillWinPoll from '@/components/WhoWillWinPoll.vue'
-import MatchDiscussion from '@/components/MatchDiscussion.vue'
+import LazyOnVisible from '@/components/LazyOnVisible.vue'
 import HeadToHead from '@/components/HeadToHead.vue'
 import MatchRoster from '@/components/MatchRoster.vue'
+
+// Its own file, downloaded when the discussion first scrolls into view
+const MatchDiscussion = defineAsyncComponent(() => import('@/components/MatchDiscussion.vue'))
 
 const route = useRoute()
 const { match, rosters, history, loading, error } = useMatch(() => route.params.id)

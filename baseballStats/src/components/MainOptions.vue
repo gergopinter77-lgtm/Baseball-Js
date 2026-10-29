@@ -1,7 +1,8 @@
 <template>
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-2xl mt-6">
         <RouterLink
-            v-for="option in options"
+            v-for="(option, i) in options"
+            v-reveal="i"
             :key="option.to"
             :to="option.to"
             class="card p-5 flex items-center justify-between group hover:border-secondary/50 hover:bg-primary-raised transition-colors"

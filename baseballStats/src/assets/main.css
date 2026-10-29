@@ -94,3 +94,58 @@
   from { transform: translateX(-100%); }
   to { transform: translateX(300%); }
 }
+
+/* ---------- Animations ---------- */
+
+/* Pages fade and rise in (App.vue wraps RouterView in <Transition name="page">) */
+.page-enter-active {
+  transition: opacity 0.25s ease-out, transform 0.25s ease-out;
+}
+.page-leave-active {
+  transition: opacity 0.12s ease-in;
+}
+.page-enter-from {
+  opacity: 0;
+  transform: translateY(8px);
+}
+.page-leave-to {
+  opacity: 0;
+}
+
+/* v-reveal: hidden until it scrolls into view, then slides up */
+@keyframes reveal-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: none; }
+}
+.reveal {
+  opacity: 0;
+}
+.reveal-in {
+  animation: reveal-up 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+/* Lazy images fade in once they have loaded (main.js adds .img-loaded) */
+img[loading='lazy'] {
+  transition: opacity 0.3s ease-out;
+}
+img[loading='lazy']:not(.img-loaded) {
+  opacity: 0;
+}
+
+/* No movement for people who asked their system for less of it */
+@media (prefers-reduced-motion: reduce) {
+  .page-enter-active,
+  .page-leave-active,
+  img[loading='lazy'] {
+    transition: none;
+  }
+  .page-enter-from {
+    transform: none;
+  }
+  .reveal {
+    opacity: 1;
+  }
+  .reveal-in {
+    animation: none;
+  }
+}

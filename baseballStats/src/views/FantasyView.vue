@@ -39,6 +39,7 @@
         <p v-if="error" class="alert-error mb-6">{{ error }}</p>
 
         <FantasyLeaderboard
+            v-reveal
             :entries="leaderboard"
             :slot-count="SLOTS.length"
             :stats-season="STATS_SEASON"
@@ -48,7 +49,7 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-[1fr_22rem] gap-6 items-start">
             <!-- Player market -->
-            <section class="card p-5 min-w-0">
+            <section v-reveal="1" class="card p-5 min-w-0">
                 <div class="flex flex-col sm:flex-row gap-3">
                     <input v-model="search" type="search" placeholder="Search players or teams" class="input sm:flex-1" />
                     <select v-model="sort" class="input sm:w-44!" aria-label="Sort by">
@@ -98,7 +99,7 @@
                                             <span class="font-medium group-hover:text-secondary">{{ p.name }}</span>
                                             <span class="flex items-center gap-1 text-xs text-primary-light">
                                                 <template v-if="p.team">
-                                                    <img :src="teamLogoUrl(p.team.id)" alt="" class="w-3.5 h-3.5" />
+                                                    <img loading="lazy" decoding="async" :src="teamLogoUrl(p.team.id)" alt="" class="w-3.5 h-3.5" />
                                                     {{ p.team.abbreviation }}
                                                 </template>
                                                 <!-- Phones: position and points here instead of in their own columns -->
@@ -128,6 +129,7 @@
             <!-- Team, stays in view while scrolling the market on big screens -->
             <div class="lg:sticky lg:top-20">
                 <FantasyTeam
+                    v-reveal="2"
                     :team="team"
                     :budget="BUDGET"
                     :spent="spent"

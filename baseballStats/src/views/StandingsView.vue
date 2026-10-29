@@ -24,7 +24,7 @@ const { divisions, tab, setTab } = useStandings()
     </div>
 
     <template v-if="tab === 'regular'">
-      <section v-for="div in divisions" :key="div.division.id" class="col-span-12 lg:col-span-6 card p-5">
+      <section v-for="(div, i) in divisions" :key="div.division.id" v-reveal="i" class="col-span-12 lg:col-span-6 card p-5">
         <h2 class="text-xl font-semibold mb-2">{{ div.division.name }}</h2>
         <table class="w-full text-sm">
           <thead>
@@ -41,7 +41,7 @@ const { divisions, tab, setTab } = useStandings()
             <tr v-for="t in div.teamRecords" :key="t.team.id" class="border-t border-white/5">
               <td class="td pl-0!">
                 <RouterLink :to="{ name: 'team', params: { id: t.team.id } }" class="flex items-center gap-2.5 font-medium whitespace-nowrap hover:text-secondary">
-                  <img :src="teamLogoUrl(t.team.id)" class="w-6 h-6" alt="" />
+                  <img loading="lazy" decoding="async" :src="teamLogoUrl(t.team.id)" class="w-6 h-6" alt="" />
                   <!-- Short name on phones, so all columns fit -->
                   <span class="sm:hidden">{{ t.team.abbreviation }}</span>
                   <span class="hidden sm:inline">{{ t.team.teamName }}</span>

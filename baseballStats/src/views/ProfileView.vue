@@ -34,7 +34,7 @@ const { players: favouritePlayers, teams: favouriteTeamList, loading: loadingFav
 <template>
   <main class="page grid grid-cols-12 gap-6 items-start">
     <!-- Profile card -->
-    <form class="col-span-12 lg:col-span-4 card p-6" @submit.prevent="saveProfile">
+    <form v-reveal class="col-span-12 lg:col-span-4 card p-6" @submit.prevent="saveProfile">
       <div class="flex flex-col items-center text-center">
         <button type="button" class="relative group rounded-full hover:cursor-pointer" @click="fileInput.click()">
           <UserAvatar :photo="photo" :name="name || user.email" class="w-28 h-28 text-5xl" />
@@ -90,7 +90,7 @@ const { players: favouritePlayers, teams: favouriteTeamList, loading: loadingFav
 
     <div class="col-span-12 lg:col-span-8 flex flex-col gap-6">
       <!-- Favourites -->
-      <section class="card p-6">
+      <section v-reveal="1" class="card p-6">
         <h2 class="text-2xl font-semibold mb-4">Favourite players</h2>
         <p v-if="loadingFavourites && !favouritePlayers.length" class="text-sm text-primary-light">Loading favourites...</p>
         <p v-else-if="!favouritePlayers.length" class="text-sm text-primary-light">
@@ -99,7 +99,7 @@ const { players: favouritePlayers, teams: favouriteTeamList, loading: loadingFav
         <div v-else class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3">
           <div v-for="p in favouritePlayers" :key="p.id" class="relative bg-primary-raised/60 rounded-lg overflow-hidden ring-1 ring-white/5 hover:ring-secondary transition-shadow">
             <RouterLink :to="{ name: 'player', params: { id: p.id } }" class="block">
-              <img :src="playerPhotoUrl(p.id, 300)" :alt="p.fullName" class="w-full aspect-[4/5] object-cover bg-white/10">
+              <img loading="lazy" decoding="async" :src="playerPhotoUrl(p.id, 300)" :alt="p.fullName" class="w-full aspect-[4/5] object-cover bg-white/10">
               <div class="p-3">
                 <p class="text-sm font-semibold truncate">{{ p.fullName }}</p>
                 <p class="text-xs text-primary-light truncate">
@@ -119,7 +119,7 @@ const { players: favouritePlayers, teams: favouriteTeamList, loading: loadingFav
       </section>
 
       <!-- Favourite teams -->
-      <section class="card p-6">
+      <section v-reveal="1" class="card p-6">
         <h2 class="text-2xl font-semibold mb-4">Favourite teams</h2>
         <p v-if="!favouriteTeamList.length" class="text-sm text-primary-light">
           No favourite teams yet. Open a team and press the ★ to add it here.
@@ -131,7 +131,7 @@ const { players: favouritePlayers, teams: favouriteTeamList, loading: loadingFav
             class="flex items-center gap-3 bg-primary-raised/60 rounded-lg p-3 ring-1 ring-white/5 hover:ring-secondary transition-shadow"
           >
             <RouterLink :to="{ name: 'team', params: { id: t.id } }" class="flex-1 flex items-center gap-3 min-w-0">
-              <img :src="teamLogoUrl(t.id)" alt="" class="w-10 h-10 shrink-0">
+              <img loading="lazy" decoding="async" :src="teamLogoUrl(t.id)" alt="" class="w-10 h-10 shrink-0">
               <div class="min-w-0">
                 <p class="text-sm font-semibold truncate">{{ t.name }}</p>
                 <p class="text-xs text-primary-light truncate">{{ t.division?.name }}</p>
@@ -149,7 +149,7 @@ const { players: favouritePlayers, teams: favouriteTeamList, loading: loadingFav
       </section>
 
       <!-- Password -->
-      <form class="card p-6" @submit.prevent="savePassword">
+      <form v-reveal="2" class="card p-6" @submit.prevent="savePassword">
         <h2 class="text-2xl font-semibold mb-4">Change password</h2>
         <div class="grid grid-cols-12 gap-4">
           <div class="col-span-12 md:col-span-4">

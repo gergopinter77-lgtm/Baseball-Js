@@ -66,7 +66,7 @@
                 <h3 class="text-lg font-semibold mb-2">Fan ratings</h3>
                 <ul class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1">
                     <li v-for="r in ratings" :key="r.playerId" class="flex items-center gap-2 text-sm">
-                        <img :src="teamLogoUrl(r.teamId)" alt="" class="w-4 h-4" />
+                        <img loading="lazy" decoding="async" :src="teamLogoUrl(r.teamId)" alt="" class="w-4 h-4" />
                         <RouterLink :to="{ name: 'player', params: { id: r.playerId } }" class="flex-1 min-w-0 truncate hover:text-secondary">
                             {{ r.playerName }}
                         </RouterLink>
@@ -99,7 +99,7 @@
                                 class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-white/5 text-[11px] font-semibold text-primary-light"
                                 :title="`Favourite team: ${c.favouriteTeam.name ?? ''}`"
                             >
-                                <img :src="teamLogoUrl(c.favouriteTeam.id)" alt="" class="w-3.5 h-3.5" />
+                                <img loading="lazy" decoding="async" :src="teamLogoUrl(c.favouriteTeam.id)" alt="" class="w-3.5 h-3.5" />
                                 {{ c.favouriteTeam.abbreviation }}
                             </span>
                             <span class="text-xs text-primary-light">{{ timeAgo(c.createdAt) }}</span>

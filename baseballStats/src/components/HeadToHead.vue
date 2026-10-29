@@ -13,7 +13,7 @@
             <!-- Series score: wins for each team -->
             <div class="flex items-center justify-center gap-6 bg-primary-raised/40 rounded-xl py-4 mb-3">
                 <div v-for="(t, i) in teams" :key="t.id" class="flex items-center gap-3" :class="i === 1 && 'flex-row-reverse'">
-                    <img :src="teamLogoUrl(t.id)" alt="" class="w-8 h-8" />
+                    <img loading="lazy" decoding="async" :src="teamLogoUrl(t.id)" alt="" class="w-8 h-8" />
                     <span class="font-display text-4xl font-bold">{{ history.wins[t.id] }}</span>
                 </div>
             </div>
@@ -39,7 +39,7 @@
                             </td>
                             <td class="td" :class="g.away.isWinner && 'font-semibold'">
                                 <span class="flex items-center gap-2">
-                                    <img :src="teamLogoUrl(g.away.team.id)" alt="" class="w-5 h-5" />
+                                    <img loading="lazy" decoding="async" :src="teamLogoUrl(g.away.team.id)" alt="" class="w-5 h-5" />
                                     <span class="sm:hidden">{{ g.away.team.abbreviation }}</span>
                                     <span class="hidden sm:inline">{{ g.away.team.teamName }}</span>
                                 </span>
@@ -47,7 +47,7 @@
                             <td class="td text-center font-semibold">{{ g.away.score }} – {{ g.home.score }}</td>
                             <td class="td" :class="g.home.isWinner && 'font-semibold'">
                                 <span class="flex items-center gap-2">
-                                    <img :src="teamLogoUrl(g.home.team.id)" alt="" class="w-5 h-5" />
+                                    <img loading="lazy" decoding="async" :src="teamLogoUrl(g.home.team.id)" alt="" class="w-5 h-5" />
                                     <span class="sm:hidden">{{ g.home.team.abbreviation }}</span>
                                     <span class="hidden sm:inline">{{ g.home.team.teamName }}</span>
                                 </span>

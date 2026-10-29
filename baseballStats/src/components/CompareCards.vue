@@ -4,7 +4,7 @@
         <p v-else-if="error">{{ error }}</p>
 
         <template v-else-if="player">
-            <img
+            <img loading="lazy" decoding="async"
                 :src="playerPhotoUrl(player.id)"
                 :alt="player.fullName"
                 class="w-40 h-40 mx-auto object-cover object-top rounded-xl"

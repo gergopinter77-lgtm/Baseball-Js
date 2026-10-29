@@ -22,7 +22,8 @@
 
         <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <RouterLink
-                v-for="m in matches"
+                v-for="(m, i) in matches"
+                v-reveal="i"
                 :key="m.gamePk"
                 :to="{ name: 'match', params: { id: m.gamePk } }"
                 class="card p-5 hover:border-secondary/50 hover:bg-primary-raised transition-colors"
@@ -42,7 +43,7 @@
                 </div>
 
                 <div v-for="s in [m.away, m.home]" :key="s.team.id" class="flex items-center gap-3 py-1">
-                    <img :src="teamLogoUrl(s.team.id)" alt="" class="w-8 h-8" />
+                    <img loading="lazy" decoding="async" :src="teamLogoUrl(s.team.id)" alt="" class="w-8 h-8" />
                     <div class="flex-1 min-w-0">
                         <p class="font-medium truncate" :class="m.state === 'Final' && !s.isWinner && 'text-primary-light'">
                             {{ s.team.name }}

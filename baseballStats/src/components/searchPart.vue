@@ -20,7 +20,7 @@
                     class="flex items-center gap-3 px-4 py-2.5 hover:cursor-pointer hover:bg-white/5"
                     @click="selectTeam(t)"
                 >
-                    <img :src="teamLogoUrl(t.id)" alt="" class="w-8 h-8" />
+                    <img loading="lazy" decoding="async" :src="teamLogoUrl(t.id)" alt="" class="w-8 h-8" />
                     <span class="flex-1">{{ t.name }}</span>
                     <span class="text-xs font-semibold text-primary-light">{{ t.abbreviation }}</span>
                 </li>
@@ -34,7 +34,7 @@
                 class="flex items-center gap-3 px-4 py-2.5 hover:cursor-pointer hover:bg-white/5"
                 @click="selectPlayer(p)"
             >
-                <img :src="playerPhotoUrl(p.id, 80)" alt="" class="w-8 aspect-[4/5] rounded-md object-cover bg-white/10" />
+                <img loading="lazy" decoding="async" :src="playerPhotoUrl(p.id, 80)" alt="" class="w-8 aspect-[4/5] rounded-md object-cover bg-white/10" />
                 <span class="flex-1">{{ p.fullName }}</span>
                 <span class="text-xs font-semibold text-primary-light">{{ p.primaryPosition?.abbreviation }}</span>
             </li>

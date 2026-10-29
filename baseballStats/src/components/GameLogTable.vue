@@ -17,7 +17,7 @@
                     <td class="td">
                         <div class="flex items-center gap-2">
                             <span class="text-primary-light w-5 text-xs">{{ game.isHome ? 'vs' : '@' }}</span>
-                            <img :src="teamLogoUrl(game.opponent.id)" alt="" class="w-6 h-6" />
+                            <img loading="lazy" decoding="async" :src="teamLogoUrl(game.opponent.id)" alt="" class="w-6 h-6" />
                             <span>{{ game.opponent.name }}</span>
                         </div>
                     </td>

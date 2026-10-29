@@ -9,7 +9,7 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-[1fr_22rem] gap-6 items-start">
             <!-- Look for other users -->
-            <section class="card p-5">
+            <section v-reveal class="card p-5">
                 <h2 class="text-2xl font-semibold mb-3">Find people</h2>
                 <form class="flex gap-3" @submit.prevent="runSearch">
                     <input
@@ -40,7 +40,7 @@
 
             <div class="flex flex-col gap-6">
                 <!-- Friend requests sent to you, and the ones you sent -->
-                <section class="card p-5">
+                <section v-reveal="1" class="card p-5">
                     <h2 class="text-2xl font-semibold">
                         Requests
                         <span v-if="incoming.length" class="text-sm font-sans font-normal text-secondary ml-1">{{ incoming.length }}</span>
@@ -66,7 +66,7 @@
                 </section>
 
                 <!-- People you are friends with -->
-                <section class="card p-5">
+                <section v-reveal="2" class="card p-5">
                     <h2 class="text-2xl font-semibold">
                         Your friends
                         <span v-if="friends.length" class="text-sm font-sans font-normal text-primary-light ml-1">{{ friends.length }}</span>

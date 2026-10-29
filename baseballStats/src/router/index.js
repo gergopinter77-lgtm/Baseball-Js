@@ -5,6 +5,12 @@ import { useAuth } from '@/components/composables/useAuth'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
+  // New pages start at the top; Back goes to where you were. Only ?query changes keep the spot.
+  scrollBehavior(to, from, saved) {
+    if (saved) return saved
+    if (to.path === from.path) return false
+    return { top: 0 }
+  },
   routes: [
     {
       path: '/',

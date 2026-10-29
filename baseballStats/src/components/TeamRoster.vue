@@ -2,7 +2,7 @@
     <div class="flex flex-col gap-6">
         <p v-if="!groups.length" class="py-8 text-center text-primary-light">No roster available.</p>
 
-        <section v-for="group in groups" :key="group.id">
+        <section v-for="group in groups" :key="group.id" v-reveal>
             <h2 class="text-xl font-semibold mb-2">
                 {{ group.title }}
                 <span class="text-sm font-sans font-normal text-primary-light ml-1">{{ group.players.length }}</span>
@@ -25,7 +25,7 @@
                             <td class="td text-primary-light hidden sm:table-cell">{{ p.number ?? '–' }}</td>
                             <td class="td sticky left-0 z-1 bg-table sm:static sm:bg-transparent">
                                 <RouterLink :to="{ name: 'player', params: { id: p.id } }" class="flex items-center gap-3 group">
-                                    <img :src="playerPhotoUrl(p.id, 80)" alt="" class="w-8 aspect-[4/5] rounded-md object-cover bg-white/10" />
+                                    <img loading="lazy" decoding="async" :src="playerPhotoUrl(p.id, 80)" alt="" class="w-8 aspect-[4/5] rounded-md object-cover bg-white/10" />
                                     <span class="font-medium group-hover:text-secondary">{{ p.name }}</span>
                                     <span v-if="p.status" class="text-xs text-secondary">{{ p.status }}</span>
                                 </RouterLink>

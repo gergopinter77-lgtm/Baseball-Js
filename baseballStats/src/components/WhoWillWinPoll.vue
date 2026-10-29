@@ -12,7 +12,7 @@
             <div v-for="t in teams" :key="t.id">
                 <div class="flex items-center justify-between text-sm mb-1.5">
                     <span class="flex items-center gap-2 font-medium">
-                        <img :src="teamLogoUrl(t.id)" alt="" class="w-6 h-6" />
+                        <img loading="lazy" decoding="async" :src="teamLogoUrl(t.id)" alt="" class="w-6 h-6" />
                         {{ t.teamName }}
                         <span v-if="myVote === t.id" class="text-xs text-secondary">Your pick</span>
                     </span>
@@ -43,7 +43,7 @@
                     class="btn-ghost h-auto! py-4 flex-col"
                     @click="pick(t.id)"
                 >
-                    <img :src="teamLogoUrl(t.id)" alt="" class="w-10 h-10" />
+                    <img loading="lazy" decoding="async" :src="teamLogoUrl(t.id)" alt="" class="w-10 h-10" />
                     <span>{{ t.teamName }}</span>
                 </button>
             </div>

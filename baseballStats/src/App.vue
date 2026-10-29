@@ -87,6 +87,11 @@ const links = [
   </header>
 
   <div class="min-h-[calc(100vh-4rem)] bg-linear-to-b from-primary/60 to-primary-gradient">
-    <RouterView />
+    <!-- Pages fade in; keyed by path, so ?date= or ?tab= changes don't replay it -->
+    <RouterView v-slot="{ Component, route }">
+      <Transition name="page" mode="out-in">
+        <component :is="Component" :key="route.path" />
+      </Transition>
+    </RouterView>
   </div>
 </template>

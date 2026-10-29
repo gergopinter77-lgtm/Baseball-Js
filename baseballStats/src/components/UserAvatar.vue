@@ -1,5 +1,5 @@
 <template>
-    <img
+    <img loading="lazy" decoding="async"
         v-if="photo"
         :src="photo"
         alt=""

@@ -35,7 +35,7 @@ const { accounts, filtered, adminCount, loading, error, search, editing, deletin
       {{ error }}
     </p>
 
-    <section class="card p-5 overflow-x-auto">
+    <section v-reveal class="card p-5 overflow-x-auto">
       <p v-if="loading" class="text-primary-light py-6 text-center">Loading accounts...</p>
       <p v-else-if="!filtered.length" class="text-primary-light py-6 text-center">No accounts found.</p>
 

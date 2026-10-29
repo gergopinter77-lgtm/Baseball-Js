@@ -2,7 +2,7 @@
     <!-- One team's players, short version for the match page -->
     <section class="bg-primary-raised/40 rounded-xl overflow-hidden">
         <RouterLink :to="{ name: 'team', params: { id: team.id } }" class="flex items-center gap-3 px-4 py-3 border-b border-white/5 group">
-            <img :src="teamLogoUrl(team.id)" alt="" class="w-8 h-8" />
+            <img loading="lazy" decoding="async" :src="teamLogoUrl(team.id)" alt="" class="w-8 h-8" />
             <h3 class="text-xl font-semibold group-hover:text-secondary">{{ team.name }}</h3>
         </RouterLink>
 
@@ -24,7 +24,7 @@
                             <td class="td text-primary-light hidden sm:table-cell">{{ p.number ?? '–' }}</td>
                             <td class="td">
                                 <RouterLink :to="{ name: 'player', params: { id: p.id } }" class="flex items-center gap-2.5 group">
-                                    <img :src="playerPhotoUrl(p.id, 80)" alt="" class="w-7 aspect-[4/5] rounded object-cover bg-white/10" />
+                                    <img loading="lazy" decoding="async" :src="playerPhotoUrl(p.id, 80)" alt="" class="w-7 aspect-[4/5] rounded object-cover bg-white/10" />
                                     <span class="block truncate max-w-28 sm:max-w-none font-medium group-hover:text-secondary" :title="p.name">{{ p.name }}</span>
                                 </RouterLink>
                             </td>
