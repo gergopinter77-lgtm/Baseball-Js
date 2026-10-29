@@ -1,5 +1,4 @@
-// Small helper functions for match data.
-// They don't talk to the API, they only reshape data we already have.
+// Match helpers (no API calls)
 import { POSTSEASON_NAMES } from './team'
 
 // One side of a game (away or home)
@@ -47,8 +46,7 @@ export function scheduleToMatches(schedule) {
     return matches
 }
 
-// Several seasons of games between two teams -> finished games (newest first) + how many each team won.
-// The match we're looking at is left out.
+// Finished games between two teams, newest first, and wins per team (this match left out)
 export function headToHead(schedules, currentGamePk, teamIds) {
     const seen = new Set([currentGamePk])
     const games = []
@@ -97,8 +95,7 @@ export function formatTime(iso) {
     return new Date(iso).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })
 }
 
-// Boxscore -> everyone who got into the game, per team: { away: [...], home: [...] }
-// Each player: { id, name, position, teamId, summary } where summary is e.g. "2-4 | HR, 2 RBI"
+// Boxscore -> players who got into the game, per team, with their game line
 export function playersWhoPlayed(boxscore) {
     const result = {}
     for (const side of ['away', 'home']) {
@@ -129,4 +126,9 @@ export function timeAgo(date) {
     if (minutes < 60) return `${minutes} min ago`
     if (minutes < 24 * 60) return `${Math.round(minutes / 60)} h ago`
     return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })
+}
+
+// "Mon, Oct 26" (no year, for this season's lists)
+export function formatShortDate(iso) {
+    return new Date(iso).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })
 }

@@ -76,6 +76,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import OpponentCell from './OpponentCell.vue'
+import { formatShortDate as formatDate, formatTime } from './composables/match'
 
 const props = defineProps({
     past: { type: Array, required: true },
@@ -85,12 +86,4 @@ const props = defineProps({
 const PAGE_SIZE = 20
 const limit = ref(PAGE_SIZE)
 const shownPast = computed(() => props.past.slice(0, limit.value))
-
-function formatDate(iso) {
-    return new Date(iso).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })
-}
-
-function formatTime(iso) {
-    return new Date(iso).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })
-}
 </script>

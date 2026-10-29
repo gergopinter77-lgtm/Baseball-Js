@@ -7,7 +7,7 @@
 
         <!-- Logged out: the discussion needs an account, to read and to write -->
         <p v-if="!user" class="text-sm text-center py-6">
-            <RouterLink :to="{ name: 'login', query: { redirect: route.fullPath } }" class="text-secondary font-medium hover:underline">Log in</RouterLink>
+            <RouterLink :to="loginLink" class="text-secondary font-medium hover:underline">Log in</RouterLink>
             <span class="text-primary-light"> to see and join the discussion.</span>
         </p>
 
@@ -78,7 +78,7 @@
                 </ul>
             </div>
 
-            <!-- Comments, newest first. User text is shown with {{ }} only, never v-html. -->
+            <!-- Newest first; user text only with {{ }}, never v-html -->
             <p v-if="!loaded" class="py-8 text-center text-primary-light border-t border-white/5 mt-5">Loading comments...</p>
             <p v-else-if="!comments.length" class="py-8 text-center text-primary-light border-t border-white/5 mt-5">
                 No comments yet. Start the discussion!
@@ -135,83 +135,34 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
-import { useRoute } from 'vue-router'
 import UserAvatar from './UserAvatar.vue'
 import StarRating from './StarRating.vue'
-import { getBoxscore, teamLogoUrl } from '@/api/mlb'
+import { teamLogoUrl } from '@/api/mlb'
 import { useAuth } from './composables/useAuth'
+import { useLoginGate } from './composables/useLoginGate'
 import { useDiscussion } from './composables/useDiscussion'
-import { playersWhoPlayed, timeAgo } from './composables/match'
-import { COMMENT_MAX, cleanWhileTyping, cleanForPosting } from './composables/sanitize'
+import { useCommentForm } from './composables/useCommentForm'
+import { usePendingAction } from './composables/usePendingAction'
+import { timeAgo } from './composables/match'
+import { COMMENT_MAX } from './composables/sanitize'
 
 const props = defineProps({
     match: { type: Object, required: true },
 })
 
-const route = useRoute()
 const { user, profile } = useAuth()
+const { loginLink } = useLoginGate()
+
 const { comments, ratings, loaded, posting, error, post, remove } = useDiscussion(
     () => props.match.gamePk,
     () => [props.match.away.team.id, props.match.home.team.id],
 )
 
-// ---------- Players who played, for the rating ----------
+const { players, ratedPlayerId, stars, ratedPlayer, clearRating, text, canPost, onInput, submit } = useCommentForm(
+    () => props.match.gamePk,
+    post,
+)
 
-const players = ref({ away: [], home: [] })
-
-watch([() => props.match.gamePk, () => user.value?.uid], async ([gamePk, uid]) => {
-    players.value = { away: [], home: [] }
-    if (!gamePk || !uid) return
-    try {
-        players.value = playersWhoPlayed(await getBoxscore(gamePk))
-    } catch {
-        // Box score couldn't load: commenting still works, just without a rating
-    }
-}, { immediate: true })
-
-const ratedPlayerId = ref(0)
-const stars = ref(0)
-const ratedPlayer = computed(() => [...players.value.away, ...players.value.home].find((p) => p.id === ratedPlayerId.value) ?? null)
-
-function clearRating() {
-    ratedPlayerId.value = 0
-    stars.value = 0
-}
-
-// ---------- Writing ----------
-
-const text = ref('')
-
-// Can post with text, a rating, or both. A picked player needs stars first.
-const canPost = computed(() => {
-    if (ratedPlayer.value && !stars.value) return false
-    return cleanForPosting(text.value).length > 0 || !!ratedPlayer.value
-})
-
-// Clean the text on every key press, so what you see is what will be posted
-function onInput(event) {
-    const cleaned = cleanWhileTyping(event.target.value)
-    text.value = cleaned
-    // Put the cleaned text back in the box when something was taken out
-    if (event.target.value !== cleaned) event.target.value = cleaned
-}
-
-async function submit() {
-    if (!canPost.value) return
-    const rating = ratedPlayer.value ? { player: ratedPlayer.value, stars: stars.value } : null
-    if (await post(text.value, rating)) {
-        text.value = ''
-        clearRating()
-    }
-}
-
-// ---------- Deleting ----------
-
-const confirmingDelete = ref('')
-
-async function deleteComment(id) {
-    confirmingDelete.value = ''
-    await remove(id)
-}
+const { confirming: confirmingDelete, run } = usePendingAction()
+const deleteComment = (id) => run(id, remove)
 </script>

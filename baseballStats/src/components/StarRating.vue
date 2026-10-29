@@ -1,5 +1,5 @@
 <template>
-    <!-- 1-5 stars. Readonly shows a rating (halves rounded), otherwise click a star to pick it. -->
+    <!-- 1-5 stars: shows a rating (readonly) or lets you pick one -->
     <span
         class="inline-flex items-center"
         :role="readonly ? 'img' : 'radiogroup'"
@@ -39,7 +39,7 @@ defineEmits(['update:modelValue'])
 const hover = ref(0)
 const sizeClass = computed(() => ({ sm: 'text-sm', md: 'text-xl', lg: 'text-2xl' })[props.size])
 
-// While hovering, show the stars up to the mouse; otherwise the rating (rounded to the nearest star)
+// Hovered stars, otherwise the rating rounded to a whole star
 function starClass(n) {
     const shown = hover.value || Math.round(props.modelValue)
     return n <= shown ? 'text-yellow-300' : 'text-white/20'

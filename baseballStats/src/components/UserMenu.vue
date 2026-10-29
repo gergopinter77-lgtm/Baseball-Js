@@ -38,19 +38,18 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
 import UserAvatar from './UserAvatar.vue'
 import { useAuth } from './composables/useAuth'
+import { useLogout } from './composables/useLoginGate'
 
-const router = useRouter()
-const { user, profile, isAdmin, logout } = useAuth()
+const { user, profile, isAdmin } = useAuth()
+const { logoutAndLeave } = useLogout()
 
 const open = ref(false)
 const displayName = computed(() => profile.value?.displayName || user.value?.email || '')
 
 async function handleLogout() {
     open.value = false
-    await logout()
-    router.push('/login')
+    await logoutAndLeave()
 }
 </script>

@@ -10,7 +10,7 @@ const SAVE_DELAY = 600
 
 const teamDoc = (uid) => doc(db, 'fantasy', String(FANTASY_SEASON), 'teams', uid)
 
-// Every player with a price. Downloaded once and shared, so the fantasy page and profiles don't fetch it twice.
+// Every player with a price, downloaded once and shared
 let marketPromise = null
 export function loadMarket() {
     marketPromise ??= Promise.all([
@@ -27,7 +27,7 @@ export function loadMarket() {
     return marketPromise
 }
 
-// Someone's saved picks (yours or a friend's), or {} when there is no team or you may not see it
+// Someone's saved picks, or {} if there are none (or you may not see them)
 export async function loadPicksOf(uid) {
     try {
         const snap = await getDoc(teamDoc(uid))
@@ -52,8 +52,7 @@ export function teamTotals(team) {
     }
 }
 
-// Loads the player market and the logged in user's fantasy team.
-// Teams are saved as fantasy/{season}/teams/{uid} = { picks: { C: 'h-123', SP1: 'p-456', ... } }
+// The market and your team, saved as fantasy/{season}/teams/{uid} = { picks: { slot: key } }
 export function useFantasy() {
     const { user, ready } = useAuth()
 

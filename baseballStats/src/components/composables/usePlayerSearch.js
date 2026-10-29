@@ -1,7 +1,7 @@
 import { ref, computed, watch } from 'vue'
 import { searchPlayers } from '@/api/mlb'
 
-const MIN_CHARS = 2
+export const MIN_CHARS = 2
 const MAX_RESULTS = 8
 const DEBOUNCE_MS = 250
 

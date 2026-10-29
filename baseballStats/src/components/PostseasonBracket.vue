@@ -120,48 +120,11 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { getPostseason, teamLogoUrl } from '@/api/mlb'
-import { CURRENT_SEASON } from './composables/player'
-import { BRACKET_COLUMNS, FIRST_BRACKET_SEASON, summarizeSeries, abbr, formatDate } from './composables/postseason'
-
-const seasons = Array.from(
-    { length: CURRENT_SEASON - FIRST_BRACKET_SEASON + 1 },
-    (_, i) => CURRENT_SEASON - i,
-)
+import { teamLogoUrl } from '@/api/mlb'
+import { BRACKET_COLUMNS, abbr, formatDate } from './composables/postseason'
+import { usePostseason, BRACKET_SEASONS as seasons, isPlayed, hasTeams, matchLink } from './composables/usePostseason'
 
 const router = useRouter()
-
-// A game opens its match page once both teams are known (not "TBD")
-const hasTeams = (g) => !!(g.teams.away.team?.id && g.teams.home.team?.id)
-const matchLink = (g) => ({ name: 'match', params: { id: g.gamePk } })
-
-const season = ref(CURRENT_SEASON)
-const seriesById = ref(new Map())
-const selectedId = ref('W_1')
-const loading = ref(false)
-const error = ref('')
-
-const selected = computed(() => seriesById.value.get(selectedId.value))
-
-// Games that have been played (or are being played) show a score
-function isPlayed(game) {
-    return game.status.abstractGameState !== 'Preview'
-}
-
-watch(season, async (year) => {
-    loading.value = true
-    error.value = ''
-    try {
-        const data = await getPostseason(year)
-        if (year !== season.value) return
-        seriesById.value = new Map((data.series ?? []).map((s) => [s.series.id, summarizeSeries(s)]))
-        selectedId.value = 'W_1'
-    } catch (e) {
-        error.value = e.message
-    } finally {
-        loading.value = false
-    }
-}, { immediate: true })
+const { season, seriesById, selectedId, selected, loading, error } = usePostseason()
 </script>

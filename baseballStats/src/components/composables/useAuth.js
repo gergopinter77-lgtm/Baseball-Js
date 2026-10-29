@@ -41,8 +41,7 @@ onAuthStateChanged(auth, async (firebaseUser) => {
     markReady()
 })
 
-// Copies name and picture to the public profile others can search.
-// Runs in the background: if it fails, logging in and saving still work.
+// In the background: if it fails, login still works
 function syncPublicProfile(uid, p) {
     savePublicProfile(uid, p).catch(() => {})
 }
@@ -98,8 +97,7 @@ async function changePassword(currentPassword, newPassword) {
     await updatePassword(user.value, newPassword)
 }
 
-// Where to go after logging in: back to the page that sent you here (?redirect=/match/123), or home.
-// Only paths inside this site, so a link can't send you to another website.
+// After login: back to ?redirect (only paths on this site), or home
 export function redirectPath(query) {
     const path = query.redirect
     return typeof path === 'string' && path.startsWith('/') && !path.startsWith('//') ? path : '/'

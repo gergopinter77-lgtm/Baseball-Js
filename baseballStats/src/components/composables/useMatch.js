@@ -13,8 +13,7 @@ async function loadRoster(teamId, season) {
     return groupRoster(roster, teamId)
 }
 
-// Loads everything the match page needs.
-// getId is a function that returns the game id (gamePk), so we can watch it for changes.
+// Everything the match page needs (getId returns the gamePk)
 export function useMatch(getId) {
     const match = ref(null)
     const rosters = ref({ away: [], home: [] })

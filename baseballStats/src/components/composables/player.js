@@ -1,5 +1,4 @@
-// Small helper functions for player data.
-// They don't talk to the API, they only reshape data we already have.
+// Player helpers (no API calls)
 
 export const CURRENT_SEASON = new Date().getFullYear()
 
@@ -22,15 +21,14 @@ export function playerInfoLine(p) {
         .join(' · ')
 }
 
-// The API sends a list of stat blocks. Find the one with this type and group.
-// type: 'season' or 'gameLog'   group: 'pitching' or 'hitting'
+// The stat block for a type ('season' / 'gameLog') and group ('hitting' / 'pitching')
 export function findStats(player, type, group) {
     return (player.stats ?? []).find(
         (s) => s.type.displayName === type && s.group.displayName === group
     )
 }
 
-// Season totals. A traded player has one row per team plus a total row (the one without a team).
+// Season totals (for traded players, the row without a team)
 export function getSeasonTotals(player, group) {
     const splits = findStats(player, 'season', group)?.splits ?? []
     return (splits.find((s) => !s.team) ?? splits[0])?.stat ?? null

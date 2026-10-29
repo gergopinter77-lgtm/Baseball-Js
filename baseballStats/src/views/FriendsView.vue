@@ -97,64 +97,13 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
 import FriendRow from '@/components/FriendRow.vue'
 import FriendActions from '@/components/FriendActions.vue'
-import { friendlyError } from '@/components/composables/useAuth'
 import { useFriends } from '@/components/composables/useFriends'
+import { useUserSearch } from '@/components/composables/useUserSearch'
+import { usePendingAction } from '@/components/composables/usePendingAction'
 
-const { friends, incoming, outgoing, loaded, accept, remove, search: searchUsers } = useFriends()
-
-// ---------- Search ----------
-
-const search = ref('')
-const searchedFor = ref('')
-const results = ref([])
-const searching = ref(false)
-const searchError = ref('')
-
-async function runSearch() {
-    const text = search.value.trim()
-    if (!text) {
-        searchedFor.value = ''
-        results.value = []
-        return
-    }
-    searching.value = true
-    searchError.value = ''
-    try {
-        results.value = await searchUsers(text)
-        searchedFor.value = text
-    } catch (e) {
-        searchError.value = friendlyError(e)
-    } finally {
-        searching.value = false
-    }
-}
-
-// Search while typing, once the typing stops for a moment
-let typingTimer = null
-watch(search, () => {
-    clearTimeout(typingTimer)
-    typingTimer = setTimeout(runSearch, 300)
-})
-
-// ---------- Buttons ----------
-
-const busy = ref('') // uid whose button is working
-const confirming = ref('') // uid of the friend whose Remove is being confirmed
-const actionError = ref('')
-
-async function run(uid, action) {
-    busy.value = uid
-    actionError.value = ''
-    try {
-        await action(uid)
-        confirming.value = ''
-    } catch (e) {
-        actionError.value = friendlyError(e)
-    } finally {
-        busy.value = ''
-    }
-}
+const { friends, incoming, outgoing, loaded, accept, remove } = useFriends()
+const { search, searchedFor, results, searching, error: searchError, runSearch } = useUserSearch()
+const { busy, confirming, error: actionError, run } = usePendingAction()
 </script>

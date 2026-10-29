@@ -119,7 +119,7 @@
                     </table>
                 </div>
 
-                <button v-if="filtered.length > shown.length" class="btn-ghost w-full mt-4" @click="limit += PAGE_SIZE">
+                <button v-if="filtered.length > shown.length" class="btn-ghost w-full mt-4" @click="showMore">
                     Show more players
                 </button>
             </section>
@@ -145,87 +145,21 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
 import { playerPhotoUrl, teamLogoUrl } from '@/api/mlb'
 import { useAuth } from '@/components/composables/useAuth'
+import { useLoginGate } from '@/components/composables/useLoginGate'
 import { useFantasy } from '@/components/composables/useFantasy'
-import { useFriends } from '@/components/composables/useFriends'
+import { useMarketFilters, useFantasyLeaderboard } from '@/components/composables/useFantasyMarket'
 import { BUDGET, STATS_SEASON, FANTASY_SEASON, SCORING, POSITION_FILTERS, SLOTS, statLine } from '@/components/composables/fantasy'
 import FantasyTeam from '@/components/FantasyTeam.vue'
 import FantasyLeaderboard from '@/components/FantasyLeaderboard.vue'
 
-const route = useRoute()
-const router = useRouter()
-const { user, profile } = useAuth()
-const { market, team, spent, left, points, isFull, loading, error, saveState, cantAddReason, add, remove, clear, summarize, loadPicksOf } = useFantasy()
-const { friends } = useFriends()
+const { user } = useAuth()
+const { loginLink, requireLogin } = useLoginGate()
+const fantasy = useFantasy()
+const { market, team, spent, left, points, isFull, loading, error, saveState, cantAddReason, add, remove, clear } = fantasy
+const { search, position, sort, affordableOnly, filtered, shown, showMore } = useMarketFilters(market, cantAddReason)
+const { leaderboard } = useFantasyLeaderboard(fantasy)
 
-const search = ref('')
-const position = ref('All')
-const sort = ref('cost')
-const affordableOnly = ref(false)
-
-const SORTS = {
-    cost: (a, b) => b.cost - a.cost || b.points - a.points,
-    costAsc: (a, b) => a.cost - b.cost || b.points - a.points,
-    points: (a, b) => b.points - a.points,
-    value: (a, b) => b.points / b.cost - a.points / a.cost,
-}
-
-const filtered = computed(() => {
-    const q = search.value.trim().toLowerCase()
-    return market.value
-        .filter((p) => position.value === 'All' || p.position === position.value)
-        .filter((p) => !q || p.name.toLowerCase().includes(q)
-            || p.team?.name.toLowerCase().includes(q) || p.team?.abbreviation.toLowerCase() === q)
-        .filter((p) => !affordableOnly.value || !cantAddReason(p))
-        .sort(SORTS[sort.value])
-})
-
-const PAGE_SIZE = 50
-const limit = ref(PAGE_SIZE)
-const shown = computed(() => filtered.value.slice(0, limit.value))
-
-// A new search or filter starts at the top of the list again
-watch([search, position, sort, affordableOnly], () => (limit.value = PAGE_SIZE))
-
-// Your friends' saved picks: uid -> picks. Loaded again when your friends list changes.
-const friendPicks = ref({})
-watch(() => friends.value.map((f) => f.uid).join(','), async () => {
-    const list = friends.value
-    const picks = await Promise.all(list.map((f) => loadPicksOf(f.uid)))
-    friendPicks.value = Object.fromEntries(list.map((f, i) => [f.uid, picks[i]]))
-}, { immediate: true })
-
-const friendEntries = computed(() => friends.value.map((f) => ({
-    uid: f.uid,
-    name: f.displayName,
-    photo: f.photoURL,
-    ...summarize(friendPicks.value[f.uid]),
-    isMe: false,
-})))
-
-// You plus your friends' teams
-const leaderboard = computed(() => {
-    if (!user.value) return []
-    const me = {
-        uid: user.value.uid,
-        name: profile.value?.displayName || user.value.email,
-        photo: profile.value?.photoURL ?? '',
-        players: team.value.filter((s) => s.player).length,
-        spent: spent.value,
-        points: points.value,
-        isMe: true,
-    }
-    return [me, ...friendEntries.value]
-})
-
-const loginLink = computed(() => ({ name: 'login', query: { redirect: route.fullPath } }))
-
-function pick(player) {
-    // Not logged in: go log in, then come back here
-    if (!user.value) return router.push(loginLink.value)
-    add(player)
-}
+const pick = (player) => requireLogin() && add(player)
 </script>

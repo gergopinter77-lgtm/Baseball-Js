@@ -1,11 +1,9 @@
-import { ref, watch } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { collection, doc, getDoc, setDoc, query, where, getCountFromServer, serverTimestamp } from 'firebase/firestore'
 import { db } from '@/firebase'
 import { useAuth } from './useAuth'
 
-// "Who will win?" poll for one match.
-// Votes are saved as polls/{gamePk}/votes/{uid}, so every account gets one vote per match.
-// The database only lets you read the results once your own vote is saved (see firestore.rules).
+// "Who will win?" poll: polls/{gamePk}/votes/{uid}, results only after voting
 export function usePoll(getGamePk, getTeamIds) {
     const { user, ready } = useAuth()
 
@@ -63,5 +61,8 @@ export function usePoll(getGamePk, getTeamIds) {
     // Load again when another match opens or someone logs in / out
     watch([getGamePk, () => user.value?.uid], load, { immediate: true })
 
-    return { myVote, counts, loading, voting, error, vote }
+    const total = computed(() => Object.values(counts.value ?? {}).reduce((a, b) => a + b, 0))
+    const percent = (teamId) => (total.value ? Math.round((counts.value[teamId] / total.value) * 100) : 0)
+
+    return { myVote, counts, total, percent, loading, voting, error, vote }
 }

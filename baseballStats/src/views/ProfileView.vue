@@ -1,143 +1,34 @@
 <script setup>
-import { ref, watch, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref } from 'vue'
 import UserAvatar from '@/components/UserAvatar.vue'
-import { useAuth, friendlyError } from '@/components/composables/useAuth'
+import { useAuth } from '@/components/composables/useAuth'
+import { useLogout } from '@/components/composables/useLoginGate'
 import { useFavourites, useFavouriteTeams } from '@/components/composables/useFavorites'
-import { getPlayers, playerPhotoUrl, getTeams, teamLogoUrl } from '@/api/mlb'
+import { useFavouriteDetails } from '@/components/composables/useFavouriteDetails'
+import { useProfileForm, usePasswordForm, BIO_MAX } from '@/components/composables/useProfileForm'
+import { playerPhotoUrl, teamLogoUrl } from '@/api/mlb'
 
-const router = useRouter()
-const { user, profile, logout, updateMyProfile, changePassword } = useAuth()
+const { user } = useAuth()
+const { logoutAndLeave: handleLogout } = useLogout()
 const { favourites, toggleFavourite } = useFavourites()
 const { favouriteTeams, toggleFavouriteTeam } = useFavouriteTeams()
 
-const PHOTO_SIZE = 160
-const BIO_MAX = 200
-
-// ---------- Profile (picture, name, bio) ----------
-
-const name = ref(profile.value?.displayName ?? '')
-const bio = ref(profile.value?.bio ?? '')
-const photo = ref(profile.value?.photoURL ?? '')
 const fileInput = ref(null)
-const savingProfile = ref(false)
-const profileMessage = ref('')
-const profileError = ref('')
 
-// Turns the chosen image into a small square JPEG so it fits in the database
-function shrinkImage(file) {
-  return new Promise((resolve, reject) => {
-    const img = new Image()
-    img.onload = () => {
-      const side = Math.min(img.width, img.height)
-      const canvas = document.createElement('canvas')
-      canvas.width = canvas.height = PHOTO_SIZE
-      canvas.getContext('2d').drawImage(
-        img,
-        (img.width - side) / 2, (img.height - side) / 2, side, side,
-        0, 0, PHOTO_SIZE, PHOTO_SIZE,
-      )
-      URL.revokeObjectURL(img.src)
-      resolve(canvas.toDataURL('image/jpeg', 0.85))
-    }
-    img.onerror = () => reject(new Error('That file is not an image.'))
-    img.src = URL.createObjectURL(file)
-  })
-}
+const {
+  name, bio, photo, pickPhoto,
+  saving: savingProfile, message: profileMessage, error: profileError, save: saveProfile,
+} = useProfileForm()
 
-async function pickPhoto(event) {
-  const file = event.target.files[0]
-  event.target.value = ''
-  if (!file) return
-  profileError.value = ''
-  try {
-    photo.value = await shrinkImage(file)
-  } catch (err) {
-    profileError.value = err.message
-  }
-}
+const {
+  current: currentPassword, next: newPassword, confirm: confirmPassword,
+  saving: savingPassword, message: passwordMessage, error: passwordError, save: savePassword,
+} = usePasswordForm()
 
-async function saveProfile() {
-  savingProfile.value = true
-  profileMessage.value = ''
-  profileError.value = ''
-  try {
-    await updateMyProfile({ displayName: name.value.trim(), bio: bio.value.trim(), photoURL: photo.value })
-    profileMessage.value = 'Profile saved.'
-  } catch (err) {
-    profileError.value = friendlyError(err)
-  } finally {
-    savingProfile.value = false
-  }
-}
-
-// ---------- Password ----------
-
-const currentPassword = ref('')
-const newPassword = ref('')
-const confirmPassword = ref('')
-const savingPassword = ref(false)
-const passwordMessage = ref('')
-const passwordError = ref('')
-
-async function savePassword() {
-  passwordMessage.value = ''
-  passwordError.value = ''
-  if (newPassword.value !== confirmPassword.value) {
-    passwordError.value = 'The new passwords do not match.'
-    return
-  }
-  savingPassword.value = true
-  try {
-    await changePassword(currentPassword.value, newPassword.value)
-    currentPassword.value = newPassword.value = confirmPassword.value = ''
-    passwordMessage.value = 'Password changed.'
-  } catch (err) {
-    passwordError.value = err.code === 'auth/invalid-credential' ? 'Current password is wrong.' : friendlyError(err)
-  } finally {
-    savingPassword.value = false
-  }
-}
-
-// ---------- Favourites ----------
-
-const favouritePlayers = ref([])
-const loadingFavourites = ref(false)
-
-watch(favourites, async (ids) => {
-  // Removing a favourite just drops it from the list, no need to ask the API again
-  const known = favouritePlayers.value.filter((p) => ids.includes(p.id))
-  if (known.length === ids.length) {
-    favouritePlayers.value = known
-    return
-  }
-  loadingFavourites.value = true
-  try {
-    const data = await getPlayers(ids)
-    favouritePlayers.value = data.people ?? []
-  } catch {
-    favouritePlayers.value = []
-  } finally {
-    loadingFavourites.value = false
-  }
-}, { immediate: true })
-
-// Only 30 teams, so load them all once and pick the favourites
-const allTeams = ref([])
-const favouriteTeamList = computed(() => allTeams.value.filter((t) => favouriteTeams.value.includes(t.id)))
-
-onMounted(async () => {
-  try {
-    allTeams.value = (await getTeams()).teams ?? []
-  } catch {
-    allTeams.value = []
-  }
-})
-
-async function handleLogout() {
-  await logout()
-  router.push('/login')
-}
+const { players: favouritePlayers, teams: favouriteTeamList, loading: loadingFavourites } = useFavouriteDetails(
+  () => favourites.value,
+  () => favouriteTeams.value,
+)
 </script>
 
 <template>

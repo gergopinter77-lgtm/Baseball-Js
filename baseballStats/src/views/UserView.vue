@@ -102,95 +102,21 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { playerPhotoUrl, teamLogoUrl, getPlayers, getTeams } from '@/api/mlb'
+import { playerPhotoUrl, teamLogoUrl } from '@/api/mlb'
 import UserAvatar from '@/components/UserAvatar.vue'
 import FriendActions from '@/components/FriendActions.vue'
-import { useAuth } from '@/components/composables/useAuth'
-import { useFriends } from '@/components/composables/useFriends'
-import { getPublicProfile } from '@/components/composables/publicProfiles'
-import { loadMarket, loadPicksOf, teamFromPicks, teamTotals } from '@/components/composables/useFantasy'
+import { useUserProfile } from '@/components/composables/useUserProfile'
 import { STATS_SEASON, FANTASY_SEASON } from '@/components/composables/fantasy'
 
 const route = useRoute()
-const { user } = useAuth()
-const { relationTo } = useFriends()
+const {
+    person, loading, isMe, canSeeTeam,
+    favouritePlayers, favouriteTeams, favouritesLoading,
+    team, totals, teamLoading,
+} = useUserProfile(() => route.params.id)
 
-const person = ref(null)
-const loading = ref(false)
 const actionError = ref('')
-
-const isMe = computed(() => person.value?.uid === user.value?.uid)
-// The database only shows a fantasy team to its owner and their friends
-const canSeeTeam = computed(() => isMe.value || relationTo(person.value?.uid) === 'friend')
-
-async function loadPerson(uid) {
-    loading.value = true
-    actionError.value = ''
-    try {
-        person.value = await getPublicProfile(uid)
-    } catch {
-        person.value = { uid, missing: true }
-    } finally {
-        loading.value = false
-    }
-}
-
-// ---------- Favourites ----------
-
-const favouritePlayers = ref([])
-const favouriteTeams = ref([])
-const favouritesLoading = ref(false)
-
-// The profile only has ids, so look up names, positions and teams
-async function loadFavourites() {
-    favouritePlayers.value = []
-    favouriteTeams.value = []
-    const playerIds = person.value?.favouritePlayers ?? []
-    const teamIds = person.value?.favouriteTeams ?? []
-    if (!playerIds.length && !teamIds.length) return
-    favouritesLoading.value = true
-    try {
-        const [players, teams] = await Promise.all([
-            playerIds.length ? getPlayers(playerIds) : null,
-            teamIds.length ? getTeams() : null,
-        ])
-        favouritePlayers.value = players?.people ?? []
-        favouriteTeams.value = (teams?.teams ?? []).filter((t) => teamIds.includes(t.id))
-    } catch {
-        // MLB data couldn't load: show the lists as empty
-    } finally {
-        favouritesLoading.value = false
-    }
-}
-
-// ---------- Fantasy team ----------
-
-const picks = ref({})
-const byKey = ref({})
-const teamLoading = ref(false)
-const team = computed(() => teamFromPicks(picks.value, byKey.value))
-const totals = computed(() => teamTotals(team.value))
-
-async function loadTeam() {
-    picks.value = {}
-    if (!person.value || person.value.missing || !canSeeTeam.value) return
-    teamLoading.value = true
-    try {
-        const [market, saved] = await Promise.all([loadMarket(), loadPicksOf(person.value.uid)])
-        byKey.value = Object.fromEntries(market.map((p) => [p.key, p]))
-        picks.value = saved
-    } catch {
-        // Players couldn't load: show the team as empty
-    } finally {
-        teamLoading.value = false
-    }
-}
-
-// Another profile opened (/user/a -> /user/b)
-watch(() => route.params.id, (id) => id && loadPerson(id), { immediate: true })
-watch(person, loadFavourites)
-// Load the team once the profile is there, and again when you become (or stop being) friends
-watch([() => person.value?.uid, canSeeTeam], loadTeam)
+watch(() => route.params.id, () => (actionError.value = ''))
 </script>

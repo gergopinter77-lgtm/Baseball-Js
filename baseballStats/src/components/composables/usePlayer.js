@@ -3,8 +3,7 @@ import { getPlayerWithStats, getGames } from '@/api/mlb'
 import { PITCHING, HITTING } from './PlayerStats'
 import { CURRENT_SEASON, isPitcher, findStats, getSeasonTotals, buildGameRows } from './player'
 
-// Loads everything the player page needs.
-// getId is a function that returns the player id, so we can watch it for changes.
+// Everything the player page needs (getId returns the player id)
 export function usePlayer(getId) {
     const player = ref(null)
     const seasonStats = ref(null)

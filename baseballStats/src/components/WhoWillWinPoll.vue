@@ -33,7 +33,7 @@
             Voting closed when the game started.
         </p>
 
-        <!-- Vote buttons: everyone can see them, logged out users get sent to the login page -->
+        <!-- Everyone sees the buttons; logged out users go to login -->
         <template v-else>
             <div class="grid grid-cols-2 gap-3">
                 <button
@@ -59,36 +59,25 @@
 
 <script setup>
 import { computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
 import { teamLogoUrl } from '@/api/mlb'
 import { useAuth } from '@/components/composables/useAuth'
+import { useLoginGate } from '@/components/composables/useLoginGate'
 import { usePoll } from '@/components/composables/usePoll'
 
 const props = defineProps({
     match: { type: Object, required: true },
 })
 
-const route = useRoute()
-const router = useRouter()
 const { user } = useAuth()
+const { requireLogin } = useLoginGate()
 
 const teams = computed(() => [props.match.away.team, props.match.home.team])
 const closed = computed(() => props.match.state !== 'Preview')
 
-const { myVote, counts, loading, voting, error, vote } = usePoll(
+const { myVote, counts, total, percent, loading, voting, error, vote } = usePoll(
     () => props.match.gamePk,
     () => teams.value.map((t) => t.id),
 )
 
-const total = computed(() => Object.values(counts.value ?? {}).reduce((a, b) => a + b, 0))
-
-function percent(teamId) {
-    return total.value ? Math.round((counts.value[teamId] / total.value) * 100) : 0
-}
-
-function pick(teamId) {
-    // Not logged in: go log in, then come back to this match
-    if (!user.value) return router.push({ name: 'login', query: { redirect: route.fullPath } })
-    vote(teamId)
-}
+const pick = (teamId) => requireLogin() && vote(teamId)
 </script>

@@ -2,8 +2,7 @@ import { ref, watch } from 'vue'
 import { useAuth } from './useAuth'
 import { getPublicProfile, saveFavourites } from './publicProfiles'
 
-// Logged in, favourites are saved with your account (in your public profile, so others can see them).
-// The browser keeps a copy, which is also what's used when logged out.
+// Saved with your account when logged in (public profile), in the browser otherwise
 
 // One saved list of ids (players or teams), kept in the browser
 function createFavouriteList(storageKey, onChange) {
@@ -61,8 +60,7 @@ function uploadFavourites() {
 const players = createFavouriteList('favourites', uploadFavourites)
 const teams = createFavouriteList('favouriteTeams', uploadFavourites)
 
-// Which account the browser's lists came from ('' = picked while logged out),
-// so a second account on the same computer doesn't get the first one's favourites
+// Which account the browser's lists belong to ('' = logged out)
 const OWNER_KEY = 'favouritesOwner'
 function readOwner() {
     try {
@@ -79,8 +77,7 @@ function writeOwner(uid) {
     }
 }
 
-// After logging in: take the account's favourites. The first time, the account gets this browser's
-// favourites, unless they belong to another account (then it starts empty).
+// After login: use the account's list, or upload this browser's the first time
 watch(() => profile.value?.id, async (uid) => {
     if (!uid) return
     try {

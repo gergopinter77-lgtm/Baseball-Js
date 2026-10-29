@@ -1,7 +1,4 @@
-// Which stats to show, and what to call them.
-// key   = the name the MLB API uses
-// label = the short name we show on screen
-// name  = the long name (used in the Season tab)
+// Stats to show: key = API name, label = short name, name = long name (Season tab)
 
 export const PITCHING = {
   // The 10 boxes on the Overview tab

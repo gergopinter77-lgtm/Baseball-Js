@@ -44,7 +44,7 @@ service cloud.firestore {
       allow delete: if request.auth != null && (resource.data.uid == request.auth.uid || isAdmin());
     }
 
-    // Name, picture, bio and favourites only (no email), so any logged in user can find and view others
+    // Public profiles (no email): readable by any logged in user
     match /publicProfiles/{uid} {
       allow read: if request.auth != null;
       allow create, update: if request.auth != null && (request.auth.uid == uid || isAdmin())
@@ -66,7 +66,7 @@ service cloud.firestore {
     match /friendships/{id} {
       // Only the two people in it can see it
       allow read: if request.auth != null && request.auth.uid in resource.data.users;
-      // Send a request: from yourself, to someone else, as pending, under the right document name
+      // Send a request: from yourself, pending, under the right document id
       allow create: if request.auth != null
                     && request.resource.data.keys().hasOnly(['users', 'requester', 'status', 'createdAt'])
                     && request.resource.data.users is list
@@ -110,14 +110,14 @@ service cloud.firestore {
       // Results (all votes) only once you have voted yourself
       allow list: if request.auth != null &&
         exists(/databases/$(database)/documents/polls/$(gamePk)/votes/$(request.auth.uid));
-      // Vote once, for yourself, with only a team id and the server time. No changing it afterwards.
+      // One vote per account, never changed
       allow create: if request.auth != null && request.auth.uid == uid
                     && request.resource.data.keys().hasOnly(['teamId', 'createdAt'])
                     && request.resource.data.teamId is int
                     && request.resource.data.createdAt == request.time;
     }
 
-    // Fantasy teams: one per account per season. You and your friends can see it, only you can change it.
+    // Fantasy teams: you and your friends can see it, only you can change it
     match /fantasy/{season}/teams/{uid} {
       allow read: if request.auth != null && (request.auth.uid == uid || isFriendOf(uid));
       allow delete: if request.auth != null && request.auth.uid == uid;

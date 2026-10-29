@@ -30,8 +30,7 @@ function loadTeams() {
     return teamsPromise
 }
 
-// Comments of one match, saved as matches/{gamePk}/comments/{id}:
-// { uid, text, createdAt, rating?: { playerId, playerName, teamId, stars } }
+// matches/{gamePk}/comments: { uid, text, createdAt, rating? }
 export function useDiscussion(getGamePk, getMatchTeamIds) {
     const { user, isAdmin } = useAuth()
 
@@ -51,16 +50,16 @@ export function useDiscussion(getGamePk, getMatchTeamIds) {
         }
     }))
 
-    // The favourite team to show next to a name: one of the two teams playing if they like it, otherwise their first
+    // A playing team they favourite, otherwise their first favourite
     function favouriteTeamOf(author) {
         const ids = author?.favouriteTeams ?? []
         const id = ids.find((t) => getMatchTeamIds().includes(t)) ?? ids[0]
         return id ? (teamsById.value[id] ?? { id }) : null
     }
 
-    // Fan ratings per player: average stars, counting only each person's latest rating of that player
+    // Average stars per player, counting each person's latest rating only
     const ratings = computed(() => {
-        const latest = {} // "uid-playerId" -> rating, newest comment first so the first one wins
+        const latest = {} // "uid-playerId" -> newest rating
         for (const c of raw.value) {
             if (c.rating && !latest[`${c.uid}-${c.rating.playerId}`]) latest[`${c.uid}-${c.rating.playerId}`] = c.rating
         }

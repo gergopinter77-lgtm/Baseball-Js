@@ -4,14 +4,12 @@ import { db } from '@/firebase'
 import { useAuth } from './useAuth'
 import { getPublicProfile, searchPublicProfiles } from './publicProfiles'
 
-// Two people share one friendships/{uidA_uidB} document, with the smaller uid first.
-// { users: [uidA, uidB], requester: uid, status: 'pending' | 'accepted' }
-// Pending = a friend request; accepted = friends. Declining, cancelling and unfriending delete it.
+// friendships/{smallerUid_biggerUid}: { users, requester, status: 'pending' | 'accepted' }
 export function friendshipId(a, b) {
     return a < b ? `${a}_${b}` : `${b}_${a}`
 }
 
-// Created once, outside the function, so the header, the friends page and fantasy share the same lists
+// Shared by every page
 const { user } = useAuth()
 const friendships = ref([])
 const profiles = ref({}) // uid -> public profile (name, picture)
@@ -63,7 +61,7 @@ const friends = computed(() => people(friendships.value.filter((f) => f.status =
 const incoming = computed(() => people(friendships.value.filter((f) => f.status === 'pending' && f.requester !== myUid())))
 const outgoing = computed(() => people(friendships.value.filter((f) => f.status === 'pending' && f.requester === myUid())))
 
-// How the logged in user stands with someone: 'self', 'friend', 'incoming', 'outgoing' or 'none'
+// 'self', 'friend', 'incoming', 'outgoing' or 'none'
 function relationTo(uid) {
     if (uid === myUid()) return 'self'
     const f = friendships.value.find((x) => x.users.includes(uid))

@@ -51,37 +51,14 @@
 
       <p class="text-center text-sm text-primary-light mt-6">
         Have an account?
-        <RouterLink :to="{ path: '/login', query: route.query }" class="text-secondary font-medium hover:underline">Log in here</RouterLink>
+        <RouterLink :to="{ path: '/login', query: $route.query }" class="text-secondary font-medium hover:underline">Log in here</RouterLink>
       </p>
     </form>
   </main>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { useAuth, friendlyError, redirectPath } from '@/components/composables/useAuth'
+import { useAuthForm } from '@/components/composables/useAuthForm'
 
-const route = useRoute()
-const router = useRouter()
-const { register } = useAuth()
-
-const name = ref('')
-const email = ref('')
-const password = ref('')
-const error = ref('')
-const loading = ref(false)
-
-async function submit() {
-  error.value = ''
-  loading.value = true
-  try {
-    await register(email.value, password.value, name.value.trim())
-    router.push(redirectPath(route.query))
-  } catch (err) {
-    error.value = friendlyError(err)
-  } finally {
-    loading.value = false
-  }
-}
+const { name, email, password, error, loading, submitRegister: submit } = useAuthForm()
 </script>

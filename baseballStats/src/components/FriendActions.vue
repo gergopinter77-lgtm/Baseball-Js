@@ -7,34 +7,34 @@
         <template v-if="allowRemove">
             <!-- Remove asks once more before it unfriends -->
             <template v-if="confirming">
-                <button class="btn-primary h-8! px-3! text-sm" :disabled="busy" @click="run(remove)">Remove</button>
-                <button class="btn-ghost h-8! px-3! text-sm" @click="confirming = false">Keep</button>
+                <button class="btn-primary h-8! px-3! text-sm" :disabled="!!busy" @click="run(uid, remove)">Remove</button>
+                <button class="btn-ghost h-8! px-3! text-sm" @click="confirming = ''">Keep</button>
             </template>
-            <button v-else class="btn-ghost h-8! px-3! text-sm" @click="confirming = true">Remove friend</button>
+            <button v-else class="btn-ghost h-8! px-3! text-sm" @click="confirming = uid">Remove friend</button>
         </template>
     </template>
 
     <template v-else-if="relation === 'outgoing'">
         <span class="text-sm text-primary-light">Requested</span>
-        <button class="btn-ghost h-8! px-3! text-sm" :disabled="busy" @click="run(remove)">Cancel</button>
+        <button class="btn-ghost h-8! px-3! text-sm" :disabled="!!busy" @click="run(uid, remove)">Cancel</button>
     </template>
 
     <template v-else-if="relation === 'incoming'">
-        <button class="btn-primary h-8! px-3! text-sm" :disabled="busy" @click="run(accept)">Accept</button>
-        <button class="btn-ghost h-8! px-3! text-sm" :disabled="busy" @click="run(remove)">Decline</button>
+        <button class="btn-primary h-8! px-3! text-sm" :disabled="!!busy" @click="run(uid, accept)">Accept</button>
+        <button class="btn-ghost h-8! px-3! text-sm" :disabled="!!busy" @click="run(uid, remove)">Decline</button>
     </template>
 
-    <button v-else class="btn-primary h-8! px-3! text-sm" :disabled="busy" @click="run(sendRequest)">Add friend</button>
+    <button v-else class="btn-primary h-8! px-3! text-sm" :disabled="!!busy" @click="run(uid, sendRequest)">Add friend</button>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { friendlyError } from './composables/useAuth'
+import { computed, watch } from 'vue'
 import { useFriends } from './composables/useFriends'
+import { usePendingAction } from './composables/usePendingAction'
 
 const props = defineProps({
     uid: { type: String, required: true },
-    // Show a "Remove friend" button when you're already friends
+    // Show "Remove friend" when already friends
     allowRemove: { type: Boolean, default: false },
 })
 
@@ -42,20 +42,7 @@ const emit = defineEmits(['error'])
 
 const { relationTo, sendRequest, accept, remove } = useFriends()
 const relation = computed(() => relationTo(props.uid))
+const { busy, confirming, error, run } = usePendingAction()
 
-const busy = ref(false)
-const confirming = ref(false)
-
-async function run(action) {
-    busy.value = true
-    emit('error', '')
-    try {
-        await action(props.uid)
-        confirming.value = false
-    } catch (e) {
-        emit('error', friendlyError(e))
-    } finally {
-        busy.value = false
-    }
-}
+watch(error, (message) => emit('error', message))
 </script>

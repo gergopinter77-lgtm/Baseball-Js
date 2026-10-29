@@ -1,8 +1,6 @@
-// Small helper functions for team data.
-// They don't talk to the API, they only reshape data we already have.
+// Team helpers (no API calls)
 
-// Roster sections, in the order they are shown.
-// Pitchers are split into starters and relievers by how many of their games they started.
+// Roster sections in order; pitchers split into starters and relievers
 export const ROSTER_GROUPS = [
     { id: 'SP', title: 'Starting pitchers', stats: 'pitching' },
     { id: 'RP', title: 'Relief pitchers', stats: 'pitching' },
@@ -92,7 +90,7 @@ export const TEAM_STATS = [
 
 export const POSTSEASON_NAMES = { F: 'Wild Card', D: 'Division Series', L: 'LCS', W: 'World Series' }
 
-// One player's season stats for a group, preferring the split with this team (traded players have several)
+// A player's season stats for a group, preferring this team's split
 function rosterStats(person, group, teamId) {
     const splits = person.stats?.find((s) => s.group.displayName === group)?.splits ?? []
     return (splits.find((s) => s.team?.id === teamId) ?? splits.find((s) => !s.team) ?? splits[0])?.stat ?? null
@@ -162,7 +160,7 @@ export function splitSchedule(schedule, teamId) {
     }
 }
 
-// The API sends one block per group; turn it into { hitting: {...}, pitching: {...}, fielding: {...} }
+// Stat blocks -> { hitting, pitching, fielding }
 export function teamStatsByGroup(data) {
     const result = {}
     for (const block of data?.stats ?? []) {

@@ -1,12 +1,9 @@
-// Helpers that turn the API's postseason series into what the bracket shows.
-// They don't talk to the API, they only reshape data we already have.
+// Postseason bracket helpers (no API calls)
 
 // First season with today's 12-team format (the bracket layout below depends on it)
 export const FIRST_BRACKET_SEASON = 2022
 
-// Bracket columns from left to right: AL side, World Series in the middle, NL side.
-// Series ids come from the API: F = Wild Card, D = Division Series, L = LCS, W = World Series.
-// The ids are ordered so each series sits next to the one its winner moves on to.
+// Bracket columns, AL to NL; each series sits next to the one its winner plays next
 export const BRACKET_COLUMNS = [
     { title: 'AL Wild Card', ids: ['F_2', 'F_1'] },
     { title: 'AL Division Series', ids: ['D_1', 'D_2'] },

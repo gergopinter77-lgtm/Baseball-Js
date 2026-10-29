@@ -3,8 +3,7 @@ import { getTeam, getTeamRoster, getTeamSchedule, getTeamStats } from '@/api/mlb
 import { CURRENT_SEASON } from './player'
 import { groupRoster, splitSchedule, teamStatsByGroup } from './team'
 
-// Loads everything the team page needs.
-// getId is a function that returns the team id, so we can watch it for changes.
+// Everything the team page needs (getId returns the team id)
 export function useTeam(getId) {
     const team = ref(null)
     const rosterGroups = ref([])

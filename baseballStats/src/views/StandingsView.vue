@@ -1,26 +1,9 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { getStandings, teamLogoUrl } from '@/api/mlb'
-import { CURRENT_SEASON } from '@/components/composables/player'
+import { teamLogoUrl } from '@/api/mlb'
+import { useStandings } from '@/components/composables/useStandings'
 import PostseasonBracket from '@/components/PostseasonBracket.vue'
 
-const route = useRoute()
-const router = useRouter()
-
-const divisions = ref([])
-
-// The open tab lives in the URL (?tab=postseason) so it survives a refresh
-const tab = computed(() => (route.query.tab === 'postseason' ? 'postseason' : 'regular'))
-
-function setTab(name) {
-  router.replace({ query: name === 'regular' ? {} : { tab: name } })
-}
-
-onMounted(async () => {
-  const data = await getStandings(CURRENT_SEASON)
-  divisions.value = data.records
-})
+const { divisions, tab, setTab } = useStandings()
 </script>
 
 <template>

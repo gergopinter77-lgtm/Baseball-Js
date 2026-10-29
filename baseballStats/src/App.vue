@@ -1,30 +1,14 @@
 <script setup>
-import { ref } from 'vue'
-import { RouterLink, RouterView, useRouter } from 'vue-router'
+import { RouterLink, RouterView } from 'vue-router'
 import Atbat from '@/components/icons/atbat.svg?component'
 import UserMenu from '@/components/UserMenu.vue'
 import { useAuth } from '@/components/composables/useAuth'
 import { useFriends } from '@/components/composables/useFriends'
+import { useNavigationLoading } from '@/components/composables/useNavigationLoading'
 
 const { user, isAdmin } = useAuth()
-// Friend requests waiting for an answer, shown as a number on the Friends button
 const { incoming } = useFriends()
-
-// True while a page is opening, so a slow first click shows the loading bar instead of looking stuck
-// (only after a short wait, so pages that open right away don't flash it)
-const router = useRouter()
-const navigating = ref(false)
-let showTimer = null
-function stopLoading() {
-  clearTimeout(showTimer)
-  navigating.value = false
-}
-router.beforeEach(() => {
-  clearTimeout(showTimer)
-  showTimer = setTimeout(() => (navigating.value = true), 150)
-})
-router.afterEach(stopLoading)
-router.onError(stopLoading)
+const { navigating } = useNavigationLoading()
 
 const links = [
   { to: '/', label: 'Home' },

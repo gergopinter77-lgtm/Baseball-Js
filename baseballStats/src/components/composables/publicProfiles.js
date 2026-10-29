@@ -1,8 +1,7 @@
 import { doc, getDoc, setDoc, deleteDoc, collection, query, where, orderBy, limit, getDocs } from 'firebase/firestore'
 import { db } from '@/firebase'
 
-// The part of a profile other users may see: name, picture, bio and favourites, never the email.
-// Saved as publicProfiles/{uid}, so users can search each other without reading the private users collection.
+// publicProfiles/{uid}: what others may see (name, picture, bio, favourites; never the email)
 const profileDoc = (uid) => doc(db, 'publicProfiles', uid)
 
 // What the public copy of a private profile looks like
@@ -17,21 +16,17 @@ function publicFields({ displayName, photoURL, bio }) {
     }
 }
 
-// Keep the public copy in step with the private profile.
-// merge keeps the fields that aren't in the private profile (the favourites).
+// Copy the private profile to the public one (merge keeps the favourites)
 export async function savePublicProfile(uid, profile) {
     await setDoc(profileDoc(uid), publicFields(profile), { merge: true })
 }
 
-// Favourite player and team ids, so others can see them on your profile.
-// The name fields go along, so this also works before the public profile exists.
+// Favourite ids; the name fields go along in case the public profile is new
 export async function saveFavourites(uid, profile, { favouritePlayers, favouriteTeams }) {
     await setDoc(profileDoc(uid), { ...publicFields(profile), favouritePlayers, favouriteTeams }, { merge: true })
 }
 
-// Admins only (the database lets only them read every account).
-// Makes sure every account can be found in friend search: adds missing public profiles,
-// fixes ones with an old name, picture or bio, and removes ones whose account was deleted.
+// Admins only: makes every account searchable and removes deleted ones
 export async function syncAllPublicProfiles() {
     const [accounts, published] = await Promise.all([
         getDocs(collection(db, 'users')),

@@ -1,8 +1,6 @@
-// Rules and helper functions for fantasy baseball.
-// They don't talk to the API, they only reshape data we already have.
+// Fantasy rules and helpers (no API calls)
 
-// The fantasy game is for the next season, priced from the last finished one.
-// From October the current season is over, so we price from it; before that we use the year before.
+// Priced from the last finished season (from October, that's this year)
 const now = new Date()
 export const STATS_SEASON = now.getMonth() >= 9 ? now.getFullYear() : now.getFullYear() - 1
 export const FANTASY_SEASON = STATS_SEASON + 1
@@ -39,7 +37,7 @@ export const SLOTS = [
 // Position filter buttons on the market
 export const POSITION_FILTERS = ['All', 'C', '1B', '2B', '3B', 'SS', 'OF', 'DH', 'SP', 'RP']
 
-// How many fantasy points each stat is worth. Shown on the page, so players know how prices are made.
+// Fantasy points per stat (also shown on the page)
 export const SCORING = {
     hitting: [
         { key: 'singles', label: 'Single', points: 1 },
@@ -77,8 +75,7 @@ function hitterPosition(abbreviation) {
     return HITTERS.includes(abbreviation) ? abbreviation : 'DH'
 }
 
-// Price from points: the best player of the group costs MAX_COST.
-// The curve makes stars expensive and keeps most of the league cheap.
+// The best player of the group costs MAX_COST; the curve keeps most players cheap
 function priceFor(points, topPoints) {
     const share = Math.max(points, 0) / topPoints
     return Math.max(MIN_COST, Math.round(MIN_COST + (MAX_COST - MIN_COST) * share ** 2.5))
