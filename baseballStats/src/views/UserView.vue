@@ -5,7 +5,7 @@
 
         <template v-else-if="person">
             <!-- Picture, name, bio and friend buttons -->
-            <section class="card p-6 md:p-8 flex flex-col sm:flex-row sm:items-center gap-6">
+            <section class="card p-4 sm:p-6 md:p-8 flex flex-col sm:flex-row sm:items-center gap-6">
                 <UserAvatar :photo="person.photoURL" :name="person.displayName" class="w-24 h-24 md:w-28 md:h-28 text-5xl" />
                 <div class="flex-1 min-w-0">
                     <h1 class="text-4xl md:text-5xl font-bold break-words">{{ person.displayName }}</h1>

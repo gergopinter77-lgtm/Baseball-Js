@@ -9,6 +9,7 @@
   --color-primary-gradient: #0A1328; /* page background */
   --color-primary: #121F3D;          /* cards */
   --color-primary-raised: #1A2A4F;   /* things inside cards, inputs */
+  --color-table: #152344;            /* raised/40 on a card, solid (for sticky table cells) */
 
   /* Text */
   --color-white: #EEF1F7;
@@ -32,6 +33,11 @@
   /* Numbers line up in columns */
   table {
     font-variant-numeric: tabular-nums;
+  }
+
+  /* Logos and photos keep their size in flex rows (otherwise table columns come out too narrow) */
+  img, svg {
+    flex-shrink: 0;
   }
 }
 
@@ -76,11 +82,11 @@
 
 /* Small uppercase table headers like on stats sites */
 @utility th {
-  @apply py-2.5 px-3 text-xs font-semibold uppercase tracking-wider text-primary-light;
+  @apply py-2.5 px-2 sm:px-3 text-xs font-semibold uppercase tracking-wider text-primary-light;
 }
 
 @utility td {
-  @apply py-2.5 px-3;
+  @apply py-2.5 px-2 sm:px-3;
 }
 
 /* Loading bar in the header while a page opens */

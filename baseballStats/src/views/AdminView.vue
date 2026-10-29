@@ -43,9 +43,9 @@ const { accounts, filtered, adminCount, loading, error, search, editing, deletin
         <thead>
           <tr>
             <th class="th">Name</th>
-            <th class="th">Email</th>
+            <th class="th hidden sm:table-cell">Email</th>
             <th class="th">Role</th>
-            <th class="th">Joined</th>
+            <th class="th hidden sm:table-cell">Joined</th>
             <th class="th"></th>
           </tr>
         </thead>
@@ -54,11 +54,14 @@ const { accounts, filtered, adminCount, loading, error, search, editing, deletin
             <td class="td">
               <div class="flex items-center gap-3">
                 <UserAvatar :photo="a.photoURL" :name="a.displayName || a.email" class="w-8 h-8 text-sm" />
-                <span class="font-medium">{{ a.displayName || '—' }}</span>
-                <span v-if="isMe(a)" class="text-xs text-primary-light">(you)</span>
+                <span class="min-w-0">
+                  <span class="font-medium">{{ a.displayName || '—' }}</span>
+                  <span v-if="isMe(a)" class="text-xs text-primary-light ml-1">(you)</span>
+                  <span class="sm:hidden block text-xs text-primary-light truncate max-w-40">{{ a.email }}</span>
+                </span>
               </div>
             </td>
-            <td class="td text-primary-light">{{ a.email }}</td>
+            <td class="td text-primary-light hidden sm:table-cell">{{ a.email }}</td>
             <td class="td">
               <span
                 class="px-2.5 py-0.5 rounded-full text-xs font-semibold"
@@ -67,7 +70,7 @@ const { accounts, filtered, adminCount, loading, error, search, editing, deletin
                 {{ a.role === 'admin' ? 'Admin' : 'User' }}
               </span>
             </td>
-            <td class="td text-primary-light">{{ formatDate(a.createdAt) }}</td>
+            <td class="td text-primary-light hidden sm:table-cell">{{ formatDate(a.createdAt) }}</td>
             <td class="td text-right">
               <button class="btn-ghost h-9! px-3! text-sm mr-2" @click="openEdit(a)">
                 Edit

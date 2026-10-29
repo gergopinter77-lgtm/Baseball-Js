@@ -40,8 +40,11 @@ const { divisions, tab, setTab } = useStandings()
           <tbody>
             <tr v-for="t in div.teamRecords" :key="t.team.id" class="border-t border-white/5">
               <td class="td pl-0!">
-                <RouterLink :to="{ name: 'team', params: { id: t.team.id } }" class="flex items-center gap-2.5 font-medium hover:text-secondary">
-                  <img :src="teamLogoUrl(t.team.id)" class="w-6 h-6" alt="" />{{ t.team.teamName }}
+                <RouterLink :to="{ name: 'team', params: { id: t.team.id } }" class="flex items-center gap-2.5 font-medium whitespace-nowrap hover:text-secondary">
+                  <img :src="teamLogoUrl(t.team.id)" class="w-6 h-6" alt="" />
+                  <!-- Short name on phones, so all columns fit -->
+                  <span class="sm:hidden">{{ t.team.abbreviation }}</span>
+                  <span class="hidden sm:inline">{{ t.team.teamName }}</span>
                 </RouterLink>
               </td>
               <td class="td text-right">{{ t.wins }}</td>

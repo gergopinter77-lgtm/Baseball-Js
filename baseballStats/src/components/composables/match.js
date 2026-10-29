@@ -132,3 +132,9 @@ export function timeAgo(date) {
 export function formatShortDate(iso) {
     return new Date(iso).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })
 }
+
+// "2026-10-26" -> "26 Oct 26" (short, for phones)
+export function formatDayShort(dateString) {
+    const [y, m, d] = dateString.split('-').map(Number)
+    return new Date(y, m - 1, d).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: '2-digit' })
+}

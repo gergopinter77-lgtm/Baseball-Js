@@ -71,13 +71,13 @@
                 <table class="w-full text-sm whitespace-nowrap">
                     <thead>
                         <tr>
-                            <th class="th text-left">Game</th>
+                            <th class="th text-left hidden sm:table-cell">Game</th>
                             <th class="th text-left">Date</th>
                             <th class="th text-left">Away</th>
                             <th class="th text-center">R</th>
-                            <th class="th text-left pl-6!">Home</th>
+                            <th class="th text-left sm:pl-6!">Home</th>
                             <th class="th text-center">R</th>
-                            <th class="th text-right">Status</th>
+                            <th class="th text-right hidden sm:table-cell">Status</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -88,26 +88,31 @@
                             :class="[!isPlayed(g) && 'text-primary-light', hasTeams(g) && 'cursor-pointer hover:bg-white/3']"
                             @click="hasTeams(g) && router.push(matchLink(g))"
                         >
-                            <td class="td">
+                            <td class="td hidden sm:table-cell">
                                 <RouterLink v-if="hasTeams(g)" :to="matchLink(g)" class="hover:text-secondary">{{ g.seriesGameNumber }}</RouterLink>
                                 <template v-else>{{ g.seriesGameNumber }}</template>
                             </td>
-                            <td class="td">{{ formatDate(g.gameDate) }}</td>
+                            <td class="td">
+                                {{ formatDate(g.gameDate) }}
+                                <span v-if="g.ifNecessary === 'Y' && !isPlayed(g)" class="sm:hidden block text-[11px]">if needed</span>
+                            </td>
                             <td class="td" :class="g.teams.away.isWinner && 'font-bold'">
                                 <span class="flex items-center gap-2">
                                     <img v-if="g.teams.away.team?.id" :src="teamLogoUrl(g.teams.away.team.id)" alt="" class="w-6 h-6" />
-                                    {{ g.teams.away.team?.teamName ?? 'TBD' }}
+                                    <span class="sm:hidden">{{ g.teams.away.team?.abbreviation ?? 'TBD' }}</span>
+                                    <span class="hidden sm:inline">{{ g.teams.away.team?.teamName ?? 'TBD' }}</span>
                                 </span>
                             </td>
                             <td class="td text-center" :class="g.teams.away.isWinner && 'font-bold'">{{ g.teams.away.score ?? '–' }}</td>
-                            <td class="td pl-6!" :class="g.teams.home.isWinner && 'font-bold'">
+                            <td class="td sm:pl-6!" :class="g.teams.home.isWinner && 'font-bold'">
                                 <span class="flex items-center gap-2">
                                     <img v-if="g.teams.home.team?.id" :src="teamLogoUrl(g.teams.home.team.id)" alt="" class="w-6 h-6" />
-                                    {{ g.teams.home.team?.teamName ?? 'TBD' }}
+                                    <span class="sm:hidden">{{ g.teams.home.team?.abbreviation ?? 'TBD' }}</span>
+                                    <span class="hidden sm:inline">{{ g.teams.home.team?.teamName ?? 'TBD' }}</span>
                                 </span>
                             </td>
                             <td class="td text-center" :class="g.teams.home.isWinner && 'font-bold'">{{ g.teams.home.score ?? '–' }}</td>
-                            <td class="td text-right">
+                            <td class="td text-right hidden sm:table-cell">
                                 {{ g.status.detailedState }}<span v-if="g.ifNecessary === 'Y' && !isPlayed(g)" class="text-xs"> (if needed)</span>
                                 <span v-if="hasTeams(g)" class="text-secondary ml-1.5">→</span>
                             </td>

@@ -8,33 +8,35 @@
 
         <p v-if="!groups.length" class="py-8 text-center text-primary-light">No roster available.</p>
 
-        <table v-else class="w-full text-sm whitespace-nowrap">
-            <template v-for="group in groups" :key="group.id">
-                <thead>
-                    <tr>
-                        <th class="th text-left w-10">#</th>
-                        <th class="th text-left">{{ group.title }}</th>
-                        <th class="th text-left">Pos</th>
-                        <th v-for="col in COLUMNS[group.stats]" :key="col.key" class="th text-right">{{ col.label }}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="p in group.players" :key="p.id" class="border-t border-white/5 hover:bg-white/3">
-                        <td class="td text-primary-light">{{ p.number ?? '–' }}</td>
-                        <td class="td">
-                            <RouterLink :to="{ name: 'player', params: { id: p.id } }" class="flex items-center gap-2.5 group">
-                                <img :src="playerPhotoUrl(p.id, 80)" alt="" class="w-7 aspect-[4/5] rounded object-cover bg-white/10" />
-                                <span class="font-medium group-hover:text-secondary">{{ p.name }}</span>
-                            </RouterLink>
-                        </td>
-                        <td class="td">{{ p.position }}</td>
-                        <td v-for="col in COLUMNS[group.stats]" :key="col.key" class="td text-right">
-                            {{ p.stat?.[col.key] ?? '–' }}
-                        </td>
-                    </tr>
-                </tbody>
-            </template>
-        </table>
+        <div v-else class="overflow-x-auto">
+            <table class="w-full text-sm whitespace-nowrap">
+                <template v-for="group in groups" :key="group.id">
+                    <thead>
+                        <tr>
+                            <th class="th text-left w-10 hidden sm:table-cell">#</th>
+                            <th class="th text-left whitespace-normal sm:whitespace-nowrap">{{ group.title }}</th>
+                            <th class="th text-left">Pos</th>
+                            <th v-for="col in COLUMNS[group.stats]" :key="col.key" class="th text-right">{{ col.label }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="p in group.players" :key="p.id" class="border-t border-white/5 hover:bg-white/3">
+                            <td class="td text-primary-light hidden sm:table-cell">{{ p.number ?? '–' }}</td>
+                            <td class="td">
+                                <RouterLink :to="{ name: 'player', params: { id: p.id } }" class="flex items-center gap-2.5 group">
+                                    <img :src="playerPhotoUrl(p.id, 80)" alt="" class="w-7 aspect-[4/5] rounded object-cover bg-white/10" />
+                                    <span class="block truncate max-w-28 sm:max-w-none font-medium group-hover:text-secondary" :title="p.name">{{ p.name }}</span>
+                                </RouterLink>
+                            </td>
+                            <td class="td">{{ p.position }}</td>
+                            <td v-for="col in COLUMNS[group.stats]" :key="col.key" class="td text-right">
+                                {{ p.stat?.[col.key] ?? '–' }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </template>
+            </table>
+        </div>
     </section>
 </template>
 

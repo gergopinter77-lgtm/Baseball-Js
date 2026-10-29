@@ -7,11 +7,12 @@
             </div>
 
             <!-- Day picker -->
-            <div class="flex items-center gap-2">
-                <button class="btn-ghost px-3!" aria-label="Previous day" @click="setDate(addDays(date, -1))">←</button>
-                <input type="date" :value="date" class="input w-auto! scheme-dark" @change="setDate($event.target.value)" />
-                <button class="btn-ghost px-3!" aria-label="Next day" @click="setDate(addDays(date, 1))">→</button>
-                <button v-if="date !== today" class="btn-ghost" @click="setDate(today)">Today</button>
+            <!-- Full width on phones, the date box takes the space that is left -->
+            <div class="flex items-center gap-2 w-full sm:w-auto">
+                <button class="btn-ghost px-3! shrink-0" aria-label="Previous day" @click="setDate(addDays(date, -1))">←</button>
+                <input type="date" :value="date" class="input flex-1 min-w-0 sm:w-auto! sm:flex-none scheme-dark" @change="setDate($event.target.value)" />
+                <button class="btn-ghost px-3! shrink-0" aria-label="Next day" @click="setDate(addDays(date, 1))">→</button>
+                <button v-if="date !== today" class="btn-ghost px-3! shrink-0" @click="setDate(today)">Today</button>
             </div>
         </div>
 

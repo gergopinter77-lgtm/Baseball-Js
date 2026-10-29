@@ -1,6 +1,6 @@
 <template>
     <main class="page">
-        <div class="card p-6 md:p-8">
+        <div class="card p-4 sm:p-6 md:p-8">
             <p v-if="loading && !match" class="text-center text-lg text-primary-light py-24">Loading match...</p>
             <p v-else-if="error" class="text-center text-lg text-secondary py-24">{{ error }}</p>
 

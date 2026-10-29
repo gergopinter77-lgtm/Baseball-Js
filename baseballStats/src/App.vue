@@ -2,6 +2,7 @@
 import { RouterLink, RouterView } from 'vue-router'
 import Atbat from '@/components/icons/atbat.svg?component'
 import UserMenu from '@/components/UserMenu.vue'
+import MobileMenu from '@/components/MobileMenu.vue'
 import { useAuth } from '@/components/composables/useAuth'
 import { useFriends } from '@/components/composables/useFriends'
 import { useNavigationLoading } from '@/components/composables/useNavigationLoading'
@@ -26,7 +27,8 @@ const links = [
         <Atbat class="w-10 h-10" />
       </RouterLink>
 
-      <div class="flex-1 min-w-0 flex items-center gap-1 text-sm font-medium overflow-x-auto whitespace-nowrap [scrollbar-width:none]">
+      <!-- Desktop: links in the bar -->
+      <div class="flex-1 min-w-0 hidden md:flex items-center gap-1 text-sm font-medium">
         <RouterLink
           v-for="link in links"
           :key="link.to"
@@ -49,7 +51,7 @@ const links = [
       <template v-if="user">
         <RouterLink
           to="/friends"
-          class="relative shrink-0 flex items-center gap-2 h-9 px-3 rounded-md text-sm font-medium text-text-nav hover:text-white hover:bg-white/5 transition-colors"
+          class="relative shrink-0 hidden md:flex items-center gap-2 h-9 px-3 rounded-md text-sm font-medium text-text-nav hover:text-white hover:bg-white/5 transition-colors"
           exact-active-class="text-white! bg-white/8"
           title="Friends"
         >
@@ -60,7 +62,7 @@ const links = [
             <path d="M16 4.6a3.5 3.5 0 0 1 0 6.8" />
             <path d="M18.5 14.2a6.5 6.5 0 0 1 3 5.8" />
           </svg>
-          <span class="hidden sm:inline">Friends</span>
+          <span>Friends</span>
           <span
             v-if="incoming.length"
             class="absolute -top-1 -right-1 min-w-5 h-5 px-1 rounded-full bg-secondary-dark text-white text-[11px] font-bold flex items-center justify-center"
@@ -69,9 +71,13 @@ const links = [
             {{ incoming.length }}
           </span>
         </RouterLink>
-        <UserMenu />
+        <UserMenu class="hidden md:block" />
       </template>
-      <RouterLink v-else to="/login" class="btn-primary h-9! px-4! text-sm shrink-0">Log in</RouterLink>
+      <RouterLink v-else to="/login" class="btn-primary h-9! px-4! text-sm shrink-0 hidden! md:inline-flex!">Log in</RouterLink>
+
+      <!-- Phones: everything in the hamburger menu -->
+      <div class="flex-1 md:hidden" />
+      <MobileMenu :links="links" :requests="incoming.length" />
     </nav>
 
     <!-- Loading bar along the bottom of the header -->

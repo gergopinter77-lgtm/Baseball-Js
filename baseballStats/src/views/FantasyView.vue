@@ -79,12 +79,12 @@
                 <p v-else-if="!filtered.length" class="py-16 text-center text-primary-light">No players match.</p>
 
                 <div v-else class="overflow-x-auto mt-4 -mx-5">
-                    <table class="w-full text-sm whitespace-nowrap">
+                    <table class="w-full text-sm sm:whitespace-nowrap">
                         <thead>
                             <tr>
                                 <th class="th text-left pl-5!">Player</th>
-                                <th class="th text-left">Pos</th>
-                                <th class="th text-right">Pts</th>
+                                <th class="th text-left hidden sm:table-cell">Pos</th>
+                                <th class="th text-right hidden sm:table-cell">Pts</th>
                                 <th class="th text-right">Price</th>
                                 <th class="th pr-5!"></th>
                             </tr>
@@ -101,16 +101,17 @@
                                                     <img :src="teamLogoUrl(p.team.id)" alt="" class="w-3.5 h-3.5" />
                                                     {{ p.team.abbreviation }}
                                                 </template>
-                                                <!-- No room for the stats on phones -->
+                                                <!-- Phones: position and points here instead of in their own columns -->
+                                                <span class="sm:hidden">· {{ p.position }} · {{ p.points }} pts</span>
                                                 <span class="hidden sm:inline">· {{ statLine(p) }}</span>
                                             </span>
                                         </span>
                                     </RouterLink>
                                 </td>
-                                <td class="td font-semibold">{{ p.position }}</td>
-                                <td class="td text-right">{{ p.points }}</td>
-                                <td class="td text-right font-display text-xl font-bold">${{ p.cost }}M</td>
-                                <td class="td text-right pr-5!">
+                                <td class="td font-semibold hidden sm:table-cell">{{ p.position }}</td>
+                                <td class="td text-right hidden sm:table-cell">{{ p.points }}</td>
+                                <td class="td text-right font-display text-xl font-bold whitespace-nowrap">${{ p.cost }}M</td>
+                                <td class="td text-right pr-5! whitespace-nowrap">
                                     <span v-if="user && cantAddReason(p)" class="text-xs text-primary-light">{{ cantAddReason(p) }}</span>
                                     <button v-else class="btn-primary h-8! px-3! text-sm" @click="pick(p)">Add</button>
                                 </td>

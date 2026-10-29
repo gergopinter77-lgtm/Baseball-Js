@@ -26,30 +26,33 @@
                             <th class="th">Away</th>
                             <th class="th text-center">Score</th>
                             <th class="th">Home</th>
-                            <th class="th text-right"></th>
+                            <th class="th text-right hidden sm:table-cell"></th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr v-for="g in shown" :key="g.gamePk" class="border-t border-white/5 hover:bg-white/3">
                             <td class="td text-primary-light">
                                 <RouterLink :to="{ name: 'match', params: { id: g.gamePk } }" class="hover:text-secondary">
-                                    {{ formatDay(g.day) }}
+                                    <span class="sm:hidden">{{ formatDayShort(g.day) }}</span>
+                                    <span class="hidden sm:inline">{{ formatDay(g.day) }}</span>
                                 </RouterLink>
                             </td>
                             <td class="td" :class="g.away.isWinner && 'font-semibold'">
                                 <span class="flex items-center gap-2">
                                     <img :src="teamLogoUrl(g.away.team.id)" alt="" class="w-5 h-5" />
-                                    {{ g.away.team.teamName }}
+                                    <span class="sm:hidden">{{ g.away.team.abbreviation }}</span>
+                                    <span class="hidden sm:inline">{{ g.away.team.teamName }}</span>
                                 </span>
                             </td>
                             <td class="td text-center font-semibold">{{ g.away.score }} – {{ g.home.score }}</td>
                             <td class="td" :class="g.home.isWinner && 'font-semibold'">
                                 <span class="flex items-center gap-2">
                                     <img :src="teamLogoUrl(g.home.team.id)" alt="" class="w-5 h-5" />
-                                    {{ g.home.team.teamName }}
+                                    <span class="sm:hidden">{{ g.home.team.abbreviation }}</span>
+                                    <span class="hidden sm:inline">{{ g.home.team.teamName }}</span>
                                 </span>
                             </td>
-                            <td class="td text-right">
+                            <td class="td text-right hidden sm:table-cell">
                                 <span
                                     v-if="g.round"
                                     class="px-2 py-0.5 rounded bg-secondary-dark/20 text-secondary text-[11px] font-semibold uppercase tracking-wide"
@@ -75,7 +78,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { teamLogoUrl } from '@/api/mlb'
-import { formatDay } from './composables/match'
+import { formatDay, formatDayShort } from './composables/match'
 
 const props = defineProps({
     history: { type: Object, required: true },

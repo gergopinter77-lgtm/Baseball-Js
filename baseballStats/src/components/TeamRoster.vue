@@ -12,8 +12,8 @@
                 <table class="w-full text-sm whitespace-nowrap">
                     <thead>
                         <tr>
-                            <th class="th text-left w-10">#</th>
-                            <th class="th text-left">Player</th>
+                            <th class="th text-left w-10 hidden sm:table-cell">#</th>
+                            <th class="th text-left sticky left-0 z-1 bg-table sm:static sm:bg-transparent">Player</th>
                             <th class="th text-left">Pos</th>
                             <th class="th text-left">B/T</th>
                             <th class="th text-right">Age</th>
@@ -22,8 +22,8 @@
                     </thead>
                     <tbody>
                         <tr v-for="p in group.players" :key="p.id" class="border-t border-white/5 hover:bg-white/3">
-                            <td class="td text-primary-light">{{ p.number ?? '–' }}</td>
-                            <td class="td">
+                            <td class="td text-primary-light hidden sm:table-cell">{{ p.number ?? '–' }}</td>
+                            <td class="td sticky left-0 z-1 bg-table sm:static sm:bg-transparent">
                                 <RouterLink :to="{ name: 'player', params: { id: p.id } }" class="flex items-center gap-3 group">
                                     <img :src="playerPhotoUrl(p.id, 80)" alt="" class="w-8 aspect-[4/5] rounded-md object-cover bg-white/10" />
                                     <span class="font-medium group-hover:text-secondary">{{ p.name }}</span>
