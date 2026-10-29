@@ -1,5 +1,9 @@
 <template>
-    <div class="card p-4 md:p-6 text-center h-full flex flex-col items-center justify-center min-h-64">
+    <!-- A player starts at the top, so both photos line up however long the names are -->
+    <div
+        class="card p-4 md:p-6 text-center h-full flex flex-col items-center min-h-64"
+        :class="player && !loading && !error ? 'justify-start' : 'justify-center'"
+    >
         <p v-if="loading" class="text-primary-light">Loading...</p>
         <p v-else-if="error" class="text-secondary">{{ error }}</p>
 
